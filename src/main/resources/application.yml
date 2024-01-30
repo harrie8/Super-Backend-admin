@@ -1,0 +1,11 @@
+spring:
+  #Swagger
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  #devtools
+  devtools:
+    livereload:
+      enabled: true
+    restart:
+      enabled: true

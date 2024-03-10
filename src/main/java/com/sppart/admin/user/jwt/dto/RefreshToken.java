@@ -2,10 +2,19 @@ package com.sppart.admin.user.jwt.dto;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
-@Builder
+@Setter
+@NoArgsConstructor
 public class RefreshToken {
-    private String email;
+    private String id;
     private String refreshToken;
+
+    @Builder
+    public RefreshToken(String id, String refreshToken) {
+        this.id = id;
+        this.refreshToken = refreshToken;
+    }
 }

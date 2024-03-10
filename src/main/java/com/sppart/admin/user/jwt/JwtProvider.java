@@ -1,9 +1,9 @@
 package com.sppart.admin.user.jwt;
 
+import com.sppart.admin.user.jwt.dto.CreateTokenDto;
 import com.sppart.admin.user.jwt.dto.JwtToken;
 import com.sppart.admin.user.jwt.dto.RefreshToken;
 import com.sppart.admin.user.service.token.TokenService;
-import com.sppart.admin.utils.Authority;
 import com.sppart.admin.utils.JwtUtils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -35,28 +35,29 @@ public class JwtProvider {
         this.tokenService = tokenService;
     }
 
-    public JwtToken generateJwtToken(String email) {
+    public JwtToken generateJwtToken(CreateTokenDto dto) {
         Date now = new Date();
 
         // Access Token 생성
         Date accessTokenExpiresIn = new Date(now.getTime() + JwtUtils.ACCESS_TOKEN_EXPIRE_TIME);
         String accessToken = Jwts.builder()
-                .setSubject(email) //payload "sub" : "email"
-                .claim(JwtUtils.AUTHORIZATION_HEADER, Authority.ROLE_USER) //payload "auth" : "ROLE_USER"
+                .setSubject(dto.getId()) //payload "sub" : "id"
+                .claim(JwtUtils.AUTHORIZATION_HEADER,
+                        dto.getAuthority()) //payload "authority" : "ROLE_ADMIN" or "ROLE_MANAGER"
                 .setIssuedAt(now)
                 .setExpiration(accessTokenExpiresIn) //payload "exp" : 2 hours
                 .signWith(key, SignatureAlgorithm.HS512) //header "alg" : 해싱 알고리즘 HS512
                 .compact();
 
         return JwtToken.builder()
-                .email(email)
+                .id(dto.getId())
                 .grantType(JwtUtils.BEARER_PREFIX)
                 .accessToken(accessToken)
-                .refreshToken(generateRefreshToken(email, now))
+                .refreshToken(generateRefreshToken(dto.getId(), now))
                 .build();
     }
 
-    private RefreshToken generateRefreshToken(String email, Date now) {
+    private RefreshToken generateRefreshToken(String id, Date now) {
         long refreshTokenExpireIn = (now.getTime()) + JwtUtils.REFRESH_TOKEN_EXPIRE_TIME;
 
         // Refresh Token 생성
@@ -66,7 +67,7 @@ public class JwtProvider {
                 .compact();
 
         RefreshToken token = RefreshToken.builder()
-                .email(email)
+                .id(id)
                 .refreshToken(refreshToken)
                 .build();
 

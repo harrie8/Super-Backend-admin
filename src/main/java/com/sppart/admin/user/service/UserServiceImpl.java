@@ -62,11 +62,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void logout(String rt) {
-        if (StringUtils.hasText(rt)) {
-            tokenService.deleteTokenValue(rt);
-        } else {
+        if (!StringUtils.hasText(rt)) {
             throw new IllegalArgumentException("401");
         }
+        tokenService.deleteTokenValue(rt);
     }
 
     @Override

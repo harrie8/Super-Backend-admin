@@ -40,12 +40,7 @@ public class UserServiceImpl implements UserService {
         ResponseUserInfo userInfoById = userMapper.getUserInfoById(request.getId());
         checkPassword(request.getPassword(), userInfoById.getPassword());
 
-        CreateTokenDto createTokenDto = CreateTokenDto.builder()
-                .id(userInfoById.getId())
-                .authority(userInfoById.getAuthority())
-                .build();
-
-        JwtToken jwtToken = jwtProvider.generateJwtToken(createTokenDto);
+        JwtToken jwtToken = getJwtToken(userInfoById);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, setCookie(jwtToken.getRefreshToken().getRefreshToken()))
@@ -53,12 +48,6 @@ public class UserServiceImpl implements UserService {
                         .userInfo(userInfoById)
                         .accessToken(jwtToken.getAccessToken())
                         .message("success").build());
-    }
-
-    private void checkPassword(String rawPassword, String encodedPassword) {
-        if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
-        }
     }
 
     @Override
@@ -84,12 +73,7 @@ public class UserServiceImpl implements UserService {
         try {
             RefreshToken refreshToken = tokenService.getTokenValue(rt, RefreshToken.class);
             ResponseUserInfo userInfoById = userMapper.getUserInfoById(refreshToken.getId());
-            CreateTokenDto createTokenDto = CreateTokenDto.builder()
-                    .id(userInfoById.getId())
-                    .authority(userInfoById.getAuthority())
-                    .build();
-
-            JwtToken jwtToken = jwtProvider.generateJwtToken(createTokenDto);
+            JwtToken jwtToken = getJwtToken(userInfoById);
 
             return ResponseEntity.ok()
                     .body(AccessToken.builder().accessToken(jwtToken.getAccessToken()).build());
@@ -99,6 +83,21 @@ public class UserServiceImpl implements UserService {
             log.info(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error");
         }
+    }
+
+    private void checkPassword(String rawPassword, String encodedPassword) {
+        if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+    }
+
+    private JwtToken getJwtToken(ResponseUserInfo userInfoById) {
+        CreateTokenDto createTokenDto = CreateTokenDto.builder()
+                .id(userInfoById.getId())
+                .authority(userInfoById.getAuthority())
+                .build();
+
+        return jwtProvider.generateJwtToken(createTokenDto);
     }
 
     private String setCookie(String refreshToken) {

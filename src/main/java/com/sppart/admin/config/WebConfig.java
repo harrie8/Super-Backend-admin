@@ -11,6 +11,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
 
+    // todo cors 설정 추가하기
+
     private final JwtArgumentResolver jwtArgumentResolver;
 
     @Override

@@ -1,3 +1,5 @@
+server:
+  port: 8081
 spring:
   profiles:
     group:
@@ -11,7 +13,7 @@ spring:
   datasource:
     #MySQL DB Setting
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/super_position
+    url: # url
     username: root
     password: #비밀번호
 ---

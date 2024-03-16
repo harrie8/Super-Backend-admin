@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +32,7 @@ public class RedisTokenService implements TokenService {
     @Override
     public <T> T getTokenValue(String key, Class<T> classType) {
         String redisValue = (String) redisTemplate.opsForValue().get(key);
-        if (redisValue == null || redisValue.isEmpty()) {
+        if (!StringUtils.hasText(redisValue)) {
             throw new InvalidTokenException();
         }
 

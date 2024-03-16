@@ -9,7 +9,6 @@ import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -49,17 +48,27 @@ public class UserController {
         return userService.regenerateToken(rt);
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/admin/test")
     public String adminTest(@AuthenticationPrincipal User user) {
-        System.out.println("user = " + user);
+        System.out.println("current user.getUserName()= " + user.getUsername());
+        System.out.println("current user.getAuthorities()= " + user.getAuthorities());
+
         return "admin authorize";
     }
 
-    @PreAuthorize("hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
     @GetMapping("/manager/test")
     public String managerTest(@AuthenticationPrincipal User user) {
-        System.out.println("user = " + user);
+        System.out.println("current user.getUserName()= " + user.getUsername());
+        System.out.println("current user.getAuthorities()= " + user.getAuthorities());
+
         return "manager authorize";
+    }
+
+    @GetMapping("/guest/test")
+    public String guestTest(@AuthenticationPrincipal User user) {
+        System.out.println("current user.getUserName()= " + user.getUsername());
+        System.out.println("current user.getAuthorities()= " + user.getAuthorities());
+
+        return "guest authorize";
     }
 }

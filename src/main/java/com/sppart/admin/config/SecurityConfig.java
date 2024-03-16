@@ -4,6 +4,7 @@ import com.sppart.admin.user.jwt.JwtAccessDeniedHandler;
 import com.sppart.admin.user.jwt.JwtAuthenticationEntryPoint;
 import com.sppart.admin.user.jwt.JwtAuthenticationFilter;
 import com.sppart.admin.user.jwt.JwtProvider;
+import com.sppart.admin.utils.Authority;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -54,7 +55,16 @@ public class SecurityConfig {
 
                 // 접근 권한 설정부
                 .and().authorizeHttpRequests()
-                .antMatchers("/**").permitAll()
+//                .antMatchers("/**").permitAll()
+                .antMatchers("/users/login").permitAll()
+
+                // for authority test
+                .antMatchers("/users/admin/test").hasAuthority(Authority.ROLE_ADMIN.name())
+                .antMatchers("/users/manager/test")
+                .hasAnyAuthority(Authority.ROLE_ADMIN.name(), Authority.ROLE_MANAGER.name())
+                .antMatchers("/users/guest/test")
+                .hasAnyAuthority(Authority.ROLE_ADMIN.name(), Authority.ROLE_MANAGER.name(),
+                        Authority.ROLE_GUEST.name())
                 .anyRequest().authenticated()
 
                 // JWT 토큰 예외처리부

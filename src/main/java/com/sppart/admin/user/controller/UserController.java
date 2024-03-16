@@ -1,5 +1,6 @@
 package com.sppart.admin.user.controller;
 
+import com.sppart.admin.user.dto.CurrentUser;
 import com.sppart.admin.user.dto.LoginRequest;
 import com.sppart.admin.user.service.UserService;
 import com.sppart.admin.utils.CookieUtils;
@@ -32,7 +33,7 @@ public class UserController {
 
     @GetMapping("/logout")
     @ResponseStatus(HttpStatus.OK)
-    public void logout(@CookieValue(name = CookieUtils.COOKIE_HEADER_NAME) String rt) {
+    public void logout(@CurrentUser String id, @CookieValue(name = CookieUtils.COOKIE_HEADER_NAME) String rt) {
         userService.logout(rt);
     }
 

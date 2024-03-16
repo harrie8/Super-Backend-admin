@@ -17,4 +17,8 @@ public class RefreshToken {
         this.id = id;
         this.refreshToken = refreshToken;
     }
+
+    public boolean isSameId(String id) {
+        return this.id.equals(id);
+    }
 }

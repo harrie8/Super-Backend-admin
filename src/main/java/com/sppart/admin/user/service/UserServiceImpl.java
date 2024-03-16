@@ -3,6 +3,7 @@ package com.sppart.admin.user.service;
 import com.sppart.admin.user.domain.mapper.UserMapper;
 import com.sppart.admin.user.dto.LoginRequest;
 import com.sppart.admin.user.dto.LoginResponse;
+import com.sppart.admin.user.dto.LogoutDto;
 import com.sppart.admin.user.dto.ResponseUserInfo;
 import com.sppart.admin.user.exception.InvalidTokenException;
 import com.sppart.admin.user.jwt.JwtProvider;
@@ -61,10 +62,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void logout(String rt) {
-        if (!StringUtils.hasText(rt)) {
+    public void logout(LogoutDto logoutDto) {
+        if (!logoutDto.isValidRt()) {
             throw new IllegalArgumentException("401");
         }
+        String rt = logoutDto.getRt();
+        RefreshToken refreshToken = tokenService.getTokenValue(rt, RefreshToken.class);
+        if (!refreshToken.isSameId(logoutDto.getId())) {
+            throw new IllegalArgumentException("401");
+        }
+
         tokenService.deleteTokenValue(rt);
     }
 

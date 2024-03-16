@@ -4,6 +4,7 @@ import com.sppart.admin.user.jwt.dto.CreateTokenDto;
 import com.sppart.admin.user.jwt.dto.JwtToken;
 import com.sppart.admin.user.jwt.dto.RefreshToken;
 import com.sppart.admin.user.service.token.TokenService;
+import com.sppart.admin.utils.Authority;
 import com.sppart.admin.utils.JwtUtils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -12,10 +13,9 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import java.security.Key;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
-import java.util.stream.Collectors;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -42,8 +42,7 @@ public class JwtProvider {
         Date accessTokenExpiresIn = new Date(now.getTime() + JwtUtils.ACCESS_TOKEN_EXPIRE_TIME);
         String accessToken = Jwts.builder()
                 .setSubject(dto.getId()) //payload "sub" : "id"
-                .claim(JwtUtils.AUTHORIZATION_HEADER,
-                        dto.getAuthority()) //payload "authority" : "ROLE_ADMIN" or "ROLE_MANAGER"
+                .claim(JwtUtils.AUTHORITY, dto.getAuthority()) //payload "authority" : "ROLE_ADMIN" or "ROLE_MANAGER"
                 .setIssuedAt(now)
                 .setExpiration(accessTokenExpiresIn) //payload "exp" : 2 hours
                 .signWith(key, SignatureAlgorithm.HS512) //header "alg" : 해싱 알고리즘 HS512
@@ -80,18 +79,20 @@ public class JwtProvider {
 
         Claims claims = parseClaims(accessToken);
 
-        if (claims.get(JwtUtils.AUTHORIZATION_HEADER) == null) {
+        Authority authority = authorityFromClaims(claims);
+        if (authority.isNone()) {
             throw new RuntimeException("권한 정보가 없는 토큰입니다.");
         }
 
-        Collection<? extends GrantedAuthority> authorities =
-                Arrays.stream(claims.get(JwtUtils.AUTHORIZATION_HEADER).toString().split(","))
-                        .map(SimpleGrantedAuthority::new)
-                        .collect(Collectors.toList());
-
+        Collection<? extends GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(authority.name()));
         UserDetails principal = new User(claims.getSubject(), "", authorities);
 
         return new UsernamePasswordAuthenticationToken(principal, "", authorities);
+    }
+
+    private Authority authorityFromClaims(Claims claims) {
+        String roleName = claims.get(JwtUtils.AUTHORITY).toString();
+        return Authority.findByName(roleName);
     }
 
     public boolean validateToken(String token) throws RuntimeException {

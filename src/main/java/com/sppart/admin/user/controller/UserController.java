@@ -3,6 +3,7 @@ package com.sppart.admin.user.controller;
 import com.sppart.admin.user.dto.LoginRequest;
 import com.sppart.admin.user.service.UserService;
 import com.sppart.admin.utils.CookieUtils;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +26,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
         return userService.login(request);
     }
 

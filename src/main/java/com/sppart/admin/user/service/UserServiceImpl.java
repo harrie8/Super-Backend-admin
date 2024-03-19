@@ -37,7 +37,8 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public ResponseEntity<?> login(LoginRequest request) {
-        ResponseUserInfo userInfoById = userMapper.getUserInfoById(request.getId());
+        ResponseUserInfo userInfoById = userMapper.getUserInfoById(request.getId())
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 회원입니다."));
         checkPassword(request.getPassword(), userInfoById.getPassword());
 
         JwtToken jwtToken = getJwtToken(userInfoById);
@@ -72,7 +73,8 @@ public class UserServiceImpl implements UserService {
 
         try {
             RefreshToken refreshToken = tokenService.getTokenValue(rt, RefreshToken.class);
-            ResponseUserInfo userInfoById = userMapper.getUserInfoById(refreshToken.getId());
+            ResponseUserInfo userInfoById = userMapper.getUserInfoById(refreshToken.getId())
+                    .orElseThrow(() -> new RuntimeException("존재하지 않는 회원입니다."));
             JwtToken jwtToken = getJwtToken(userInfoById);
 
             return ResponseEntity.ok()

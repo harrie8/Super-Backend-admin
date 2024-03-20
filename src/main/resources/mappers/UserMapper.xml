@@ -2,13 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sppart.admin.user.domain.mapper.UserMapper">
 
-    <select id="getUserInfoById" parameterType="String" resultType="com.sppart.admin.user.dto.ResponseUserInfo">
-        SELECT u.id, u.password, a.role
-        FROM `user` u
-                 INNER JOIN authority a ON u.authority_id = a.id
-        WHERE u.id = #{id};
-    </select>
-
     <select id="getUserById" parameterType="String" resultType="com.sppart.admin.user.domain.Users">
         SELECT u.id, u.password, r.name
         FROM `user` u

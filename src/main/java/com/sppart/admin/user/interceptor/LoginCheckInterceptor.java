@@ -14,12 +14,11 @@ import org.springframework.web.servlet.HandlerInterceptor;
 @Component
 @RequiredArgsConstructor
 public class LoginCheckInterceptor implements HandlerInterceptor {
-    private static final String LOGIN_URI = "/users/login";
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws Exception {
-        if (isLoginURI(request)) {
+        if (shouldNotFilter(request)) {
             return true;
         }
 
@@ -46,8 +45,10 @@ public class LoginCheckInterceptor implements HandlerInterceptor {
         return HandlerInterceptor.super.preHandle(request, response, handler);
     }
 
-    private boolean isLoginURI(HttpServletRequest request) {
-        return request.getRequestURI().equals(LOGIN_URI);
+    private boolean shouldNotFilter(HttpServletRequest request) {
+        String[] excludePath = {"/users/signup", "/users/login", "/users/regenerateToken"};
+        String path = request.getRequestURI();
+        return Arrays.stream(excludePath).anyMatch(path::startsWith);
     }
 
     private boolean isAuthNotRequired(Auth auth) {

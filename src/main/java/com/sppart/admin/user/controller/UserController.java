@@ -1,18 +1,16 @@
 package com.sppart.admin.user.controller;
 
-import com.sppart.admin.user.dto.CurrentUser;
+import com.sppart.admin.user.domain.Role;
 import com.sppart.admin.user.dto.LoginDto;
 import com.sppart.admin.user.dto.LoginRequest;
 import com.sppart.admin.user.dto.LoginResponse;
-import com.sppart.admin.user.dto.LogoutDto;
+import com.sppart.admin.user.interceptor.Auth;
 import com.sppart.admin.user.service.UserService;
-import com.sppart.admin.utils.CookieUtils;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -38,14 +36,10 @@ public class UserController {
         return ResponseEntity.ok(loginResponse);
     }
 
+    @Auth(roles = {Role.ADMIN, Role.MANAGER, Role.GUEST})
     @GetMapping("/logout")
     @ResponseStatus(HttpStatus.OK)
-    public void logout(@CurrentUser String id, @CookieValue(name = CookieUtils.COOKIE_HEADER_NAME) String rt) {
-        LogoutDto logoutDto = LogoutDto.builder()
-                .id(id)
-                .rt(rt)
-                .build();
-
-        userService.logout(logoutDto);
+    public void logout(HttpServletRequest request) {
+        userService.logout(request);
     }
 }

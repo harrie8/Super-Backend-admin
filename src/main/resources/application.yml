@@ -36,10 +36,6 @@ spring:
   config:
     activate:
       on-profile: common
-  #Redis
-  redis:
-    host: localhost
-    port: 6379
   #Swagger
   mvc:
     pathmatch:

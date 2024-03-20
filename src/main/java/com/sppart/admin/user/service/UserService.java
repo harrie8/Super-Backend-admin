@@ -1,12 +1,13 @@
 package com.sppart.admin.user.service;
 
-import com.sppart.admin.user.dto.LoginRequest;
+import com.sppart.admin.user.dto.LoginDto;
+import com.sppart.admin.user.dto.LoginResponse;
 import com.sppart.admin.user.dto.LogoutDto;
 import org.springframework.http.ResponseEntity;
 
 public interface UserService {
 
-    ResponseEntity<?> login(LoginRequest request);
+    LoginResponse login(LoginDto loginDto);
 
     void logout(LogoutDto logoutDto);
 

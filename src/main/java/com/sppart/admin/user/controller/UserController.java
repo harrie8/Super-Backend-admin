@@ -1,10 +1,13 @@
 package com.sppart.admin.user.controller;
 
 import com.sppart.admin.user.dto.CurrentUser;
+import com.sppart.admin.user.dto.LoginDto;
 import com.sppart.admin.user.dto.LoginRequest;
+import com.sppart.admin.user.dto.LoginResponse;
 import com.sppart.admin.user.dto.LogoutDto;
 import com.sppart.admin.user.service.UserService;
 import com.sppart.admin.utils.CookieUtils;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,8 +28,14 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
-        return userService.login(request);
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest,
+                                               HttpServletRequest httpServletRequest) {
+        LoginDto loginDto = LoginDto.builder()
+                .loginRequest(loginRequest)
+                .httpServletRequest(httpServletRequest)
+                .build();
+        LoginResponse loginResponse = userService.login(loginDto);
+        return ResponseEntity.ok(loginResponse);
     }
 
     @GetMapping("/logout")

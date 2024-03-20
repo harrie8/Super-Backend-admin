@@ -1,7 +1,8 @@
 package com.sppart.admin.user.service;
 
+import com.sppart.admin.user.domain.Users;
 import com.sppart.admin.user.domain.mapper.UserMapper;
-import com.sppart.admin.user.dto.LoginRequest;
+import com.sppart.admin.user.dto.LoginDto;
 import com.sppart.admin.user.dto.LoginResponse;
 import com.sppart.admin.user.dto.LogoutDto;
 import com.sppart.admin.user.dto.ResponseUserInfo;
@@ -12,13 +13,12 @@ import com.sppart.admin.user.jwt.dto.CreateTokenDto;
 import com.sppart.admin.user.jwt.dto.JwtToken;
 import com.sppart.admin.user.jwt.dto.RefreshToken;
 import com.sppart.admin.user.service.token.TokenService;
-import com.sppart.admin.utils.CookieUtils;
-import com.sppart.admin.utils.JwtUtils;
+import com.sppart.admin.utils.SessionConst;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -36,19 +36,19 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public ResponseEntity<?> login(LoginRequest request) {
-        ResponseUserInfo userInfoById = userMapper.getUserInfoById(request.getId())
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 회원입니다."));
-        checkPassword(request.getPassword(), userInfoById.getPassword());
+    public LoginResponse login(LoginDto dto) {
+        Users userById = userMapper.getUserById(dto.getLoginId())
+                .orElseThrow(() -> new RuntimeException("아이디를 확인해주세요."));
+        checkPassword(dto.getLoginPassword(), userById.getPassword());
 
-        JwtToken jwtToken = getJwtToken(userInfoById);
+        HttpServletRequest httpServletRequest = dto.getHttpServletRequest();
+        HttpSession session = httpServletRequest.getSession();
+        session.setAttribute(SessionConst.LOGIN_USER, userById);
 
-        return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, setCookie(jwtToken.getRefreshToken().getRefreshToken()))
-                .body(LoginResponse.builder()
-                        .userInfo(userInfoById)
-                        .accessToken(jwtToken.getAccessToken())
-                        .message("success").build());
+        return LoginResponse.builder()
+                .users(userById)
+                .message("success")
+                .build();
     }
 
     @Override
@@ -101,19 +101,4 @@ public class UserServiceImpl implements UserService {
 
         return jwtProvider.generateJwtToken(createTokenDto);
     }
-
-    private String setCookie(String refreshToken) {
-        ResponseCookie cookie = ResponseCookie
-                .from(CookieUtils.COOKIE_HEADER_NAME, refreshToken)
-                .maxAge(JwtUtils.REFRESH_TOKEN_EXPIRE_TIME)
-                .httpOnly(true)
-                .secure(true)
-                .sameSite(CookieUtils.COOKIE_SAME_SITE)
-                .path(CookieUtils.COOKIE_PATH)
-                .domain(CookieUtils.DOMAIN)
-                .build();
-
-        return cookie.toString();
-    }
-
 }

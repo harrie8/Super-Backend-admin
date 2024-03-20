@@ -1,19 +1,18 @@
 package com.sppart.admin.user.dto;
 
+import com.sppart.admin.user.domain.Users;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 public class LoginResponse {
 
-    private final ResponseUserInfo userInfo;
-    private final String accessToken;
+    private final Users users;
     private final String message;
 
     @Builder
-    public LoginResponse(ResponseUserInfo userInfo, String accessToken, String message) {
-        this.userInfo = userInfo;
-        this.accessToken = accessToken;
+    public LoginResponse(Users users, String message) {
+        this.users = users;
         this.message = message;
     }
 }

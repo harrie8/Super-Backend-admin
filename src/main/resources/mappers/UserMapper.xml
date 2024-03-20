@@ -8,4 +8,11 @@
                  INNER JOIN authority a ON u.authority_id = a.id
         WHERE u.id = #{id};
     </select>
+
+    <select id="getUserById" parameterType="String" resultType="com.sppart.admin.user.domain.Users">
+        SELECT u.id, u.password, r.name
+        FROM `user` u
+                 INNER JOIN role r ON u.role_id = r.id
+        WHERE u.id = #{id};
+    </select>
 </mapper>

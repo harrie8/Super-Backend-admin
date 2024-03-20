@@ -13,16 +13,8 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import java.security.Key;
-import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -73,21 +65,6 @@ public class JwtProvider {
         tokenService.setTokenValue(token);
 
         return token;
-    }
-
-    public Authentication getAuthentication(String accessToken) {
-
-        Claims claims = parseClaims(accessToken);
-
-        Authority authority = authorityFromClaims(claims);
-        if (authority.isNone()) {
-            throw new RuntimeException("권한 정보가 없는 토큰입니다.");
-        }
-
-        Collection<? extends GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(authority.name()));
-        UserDetails principal = new User(claims.getSubject(), "", authorities);
-
-        return new UsernamePasswordAuthenticationToken(principal, "", authorities);
     }
 
     private Authority authorityFromClaims(Claims claims) {

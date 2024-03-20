@@ -9,8 +9,6 @@ import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,35 +38,5 @@ public class UserController {
                 .build();
 
         userService.logout(logoutDto);
-    }
-
-    @GetMapping(value = "/regenerateToken")
-    public ResponseEntity<?> regenerateToken(
-            @CookieValue(name = CookieUtils.COOKIE_HEADER_NAME, required = false) String rt) {
-        return userService.regenerateToken(rt);
-    }
-
-    @GetMapping("/admin/test")
-    public String adminTest(@AuthenticationPrincipal User user) {
-        System.out.println("current user.getUserName()= " + user.getUsername());
-        System.out.println("current user.getAuthorities()= " + user.getAuthorities());
-
-        return "admin authorize";
-    }
-
-    @GetMapping("/manager/test")
-    public String managerTest(@AuthenticationPrincipal User user) {
-        System.out.println("current user.getUserName()= " + user.getUsername());
-        System.out.println("current user.getAuthorities()= " + user.getAuthorities());
-
-        return "manager authorize";
-    }
-
-    @GetMapping("/guest/test")
-    public String guestTest(@AuthenticationPrincipal User user) {
-        System.out.println("current user.getUserName()= " + user.getUsername());
-        System.out.println("current user.getAuthorities()= " + user.getAuthorities());
-
-        return "guest authorize";
     }
 }

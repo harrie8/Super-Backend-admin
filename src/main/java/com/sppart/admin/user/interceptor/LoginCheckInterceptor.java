@@ -7,13 +7,17 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+@Order(1)
 @Component
 @RequiredArgsConstructor
 public class LoginCheckInterceptor implements HandlerInterceptor {
+
+    // todo 예외 처리
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
@@ -46,7 +50,7 @@ public class LoginCheckInterceptor implements HandlerInterceptor {
     }
 
     private boolean shouldNotFilter(HttpServletRequest request) {
-        String[] excludePath = {"/users/signup", "/users/login", "/users/regenerateToken"};
+        String[] excludePath = {"/users/signup", "/users/login"};
         String path = request.getRequestURI();
         return Arrays.stream(excludePath).anyMatch(path::startsWith);
     }
@@ -59,6 +63,6 @@ public class LoginCheckInterceptor implements HandlerInterceptor {
         Arrays.stream(auth.roles())
                 .filter(role -> role.equals(loginUser.getRole()))
                 .findAny()
-                .orElseThrow(() -> new RuntimeException("권한이 일치하지 않습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("권한이 일치하지 않습니다."));
     }
 }

@@ -1,9 +1,11 @@
 package com.sppart.admin.user.service;
 
+import com.sppart.admin.exception.SuperpositionAdminException;
 import com.sppart.admin.user.domain.Users;
 import com.sppart.admin.user.domain.mapper.UserMapper;
 import com.sppart.admin.user.dto.LoginDto;
 import com.sppart.admin.user.dto.LoginResponse;
+import com.sppart.admin.user.exception.UserErrorCode;
 import com.sppart.admin.utils.SessionConst;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -24,7 +26,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public LoginResponse login(LoginDto dto) {
         Users userById = userMapper.getUserById(dto.getLoginId())
-                .orElseThrow(() -> new RuntimeException("아이디를 확인해주세요."));
+                .orElseThrow(() -> new SuperpositionAdminException(UserErrorCode.ID_OR_PW_NOT_VALID));
         checkPassword(dto.getLoginPassword(), userById.getPassword());
 
         HttpServletRequest httpServletRequest = dto.getHttpServletRequest();
@@ -45,7 +47,7 @@ public class UserServiceImpl implements UserService {
 
     private void checkPassword(String rawPassword, String encodedPassword) {
         if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+            throw new SuperpositionAdminException(UserErrorCode.ID_OR_PW_NOT_VALID);
         }
     }
 }

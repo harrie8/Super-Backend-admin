@@ -1,5 +1,7 @@
 package com.sppart.admin.user.interceptor;
 
+import com.sppart.admin.exception.CommonErrorCode;
+import com.sppart.admin.exception.SuperpositionAdminException;
 import com.sppart.admin.user.domain.Users;
 import com.sppart.admin.utils.SessionConst;
 import java.util.Arrays;
@@ -63,6 +65,6 @@ public class LoginCheckInterceptor implements HandlerInterceptor {
         Arrays.stream(auth.roles())
                 .filter(role -> role.equals(loginUser.getRole()))
                 .findAny()
-                .orElseThrow(() -> new IllegalArgumentException("권한이 일치하지 않습니다."));
+                .orElseThrow(() -> new SuperpositionAdminException(CommonErrorCode.FORBIDDEN));
     }
 }

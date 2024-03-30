@@ -1,17 +1,22 @@
 package com.sppart.admin.exhibition.controller;
 
 import com.sppart.admin.exhibition.dto.ExhibitionSearchCondition;
+import com.sppart.admin.exhibition.dto.RequestUpdateExhibitionDisplay;
 import com.sppart.admin.exhibition.dto.ResponseBulkDeleteByIds;
 import com.sppart.admin.exhibition.dto.ResponseGetExhibitionsByCondition;
 import com.sppart.admin.exhibition.service.ExhibitionService;
 import java.time.LocalDate;
 import java.util.Set;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -49,5 +54,14 @@ public class ExhibitionController {
         ResponseBulkDeleteByIds deleteCount = exhibitionService.bulkDeleteByIds(ids);
 
         return ResponseEntity.ok(deleteCount.toString());
+    }
+
+    // todo 권한 설정하기
+    @PatchMapping("/{exhibitionId}")
+    public ResponseEntity<String> updateDisplay(@PathVariable Long exhibitionId,
+                                                @Valid @RequestBody RequestUpdateExhibitionDisplay req) {
+        exhibitionService.updateOnlyDisplay(exhibitionId, req);
+
+        return ResponseEntity.ok("display update success");
     }
 }

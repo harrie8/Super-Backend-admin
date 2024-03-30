@@ -68,4 +68,16 @@
             </where>
         </if>
     </delete>
+
+    <select id="findById" resultType="com.sppart.admin.exhibition.domain.entity.Exhibition">
+        SELECT *
+        FROM exhibition
+        WHERE exhibition_id = #{exhibitionId};
+    </select>
+
+    <update id="updateOnlyDisplay">
+        UPDATE exhibition
+        SET is_display = #{isDisplay}
+        WHERE exhibition_id = #{exhibitionId};
+    </update>
 </mapper>

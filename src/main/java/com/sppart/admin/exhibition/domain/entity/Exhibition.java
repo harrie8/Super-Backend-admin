@@ -15,11 +15,11 @@ public class Exhibition {
     private final LocalDate endDate;
     private final ExhibitionStatus status;
     private final String poster;
-    private final boolean isDisplay;
+    private int isDisplay;
 
     @Builder
     public Exhibition(Long id, String title, String subHeading, String location, LocalDate startDate, LocalDate endDate,
-                      ExhibitionStatus status, String poster, boolean isDisplay) {
+                      ExhibitionStatus status, String poster, int isDisplay) {
         this.id = id;
         this.title = title;
         this.subHeading = subHeading;
@@ -28,6 +28,10 @@ public class Exhibition {
         this.endDate = endDate;
         this.status = status;
         this.poster = poster;
+        this.isDisplay = isDisplay;
+    }
+
+    public void changeDisplay(int isDisplay) {
         this.isDisplay = isDisplay;
     }
 }

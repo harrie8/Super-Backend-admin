@@ -4,10 +4,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.groups.Tuple.tuple;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.sppart.admin.exception.SuperpositionAdminException;
 import com.sppart.admin.exhibition.domain.entity.ExhibitionStatus;
 import com.sppart.admin.exhibition.domain.mapper.ExhibitionMapper;
 import com.sppart.admin.exhibition.dto.ExhibitionSearchCondition;
+import com.sppart.admin.exhibition.dto.RequestUpdateExhibitionDisplay;
 import com.sppart.admin.productexhibition.mapper.ProductExhibitionMapper;
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -230,6 +233,37 @@ class ExhibitionServiceImplTest {
             assertEquals(beforeExhibitionCount, afterExhibitionCount);
             assertEquals(beforeProductExhibitionCount, afterProductExhibitionCount);
         });
+    }
+
+    @Test
+    @DisplayName("전시 ID로 전시 노출 상태 변경 테스트")
+    void updateOnlyDisplayTest() {
+        //given
+        var exhibitionId = 1L;
+        var expected = 0;
+        var req = RequestUpdateExhibitionDisplay.builder()
+                .isDisplay(expected)
+                .build();
+
+        //when
+        exhibitionService.updateOnlyDisplay(exhibitionId, req);
+
+        //then
+        var actual = exhibitionMapper.findById(exhibitionId).get().getIsDisplay();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 전시 ID로 전시 노출 상태 변경 테스트")
+    void updateOnlyDisplayWithNotExistsExhibitionTest() {
+        //given
+        var exhibitionId = 100L;
+        var req = RequestUpdateExhibitionDisplay.builder()
+                .isDisplay(0)
+                .build();
+
+        //expected
+        assertThrows(SuperpositionAdminException.class, () -> exhibitionService.updateOnlyDisplay(exhibitionId, req));
     }
 
     private Tuple id1Exhibition() {

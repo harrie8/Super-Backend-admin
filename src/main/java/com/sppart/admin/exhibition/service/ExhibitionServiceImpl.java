@@ -1,11 +1,15 @@
 package com.sppart.admin.exhibition.service;
 
+import com.sppart.admin.exception.SuperpositionAdminException;
+import com.sppart.admin.exhibition.domain.entity.Exhibition;
 import com.sppart.admin.exhibition.domain.mapper.ExhibitionMapper;
 import com.sppart.admin.exhibition.dto.ExhibitionByCondition;
 import com.sppart.admin.exhibition.dto.ExhibitionSearchCondition;
+import com.sppart.admin.exhibition.dto.RequestUpdateExhibitionDisplay;
 import com.sppart.admin.exhibition.dto.ResponseBulkDeleteByIds;
 import com.sppart.admin.exhibition.dto.ResponseExhibitionByCondition;
 import com.sppart.admin.exhibition.dto.ResponseGetExhibitionsByCondition;
+import com.sppart.admin.exhibition.exception.ExhibitionErrorCode;
 import com.sppart.admin.product.dto.ProductOnlyArtistNameDto;
 import com.sppart.admin.productexhibition.mapper.ProductExhibitionMapper;
 import java.util.List;
@@ -74,5 +78,14 @@ public class ExhibitionServiceImpl implements ExhibitionService {
                 .exhibitionDeleteCount(exhibitionDeleteCount)
                 .productExhibitionDeleteCount(productExhibitionDeleteCount)
                 .build();
+    }
+
+    @Override
+    @Transactional
+    public void updateOnlyDisplay(Long exhibitionId, RequestUpdateExhibitionDisplay req) {
+        Exhibition findExhibition = exhibitionMapper.findById(exhibitionId)
+                .orElseThrow(() -> new SuperpositionAdminException(ExhibitionErrorCode.NOT_FOUND));
+        findExhibition.changeDisplay(req.getIsDisplay());
+        exhibitionMapper.updateOnlyDisplay(exhibitionId, req.getIsDisplay());
     }
 }

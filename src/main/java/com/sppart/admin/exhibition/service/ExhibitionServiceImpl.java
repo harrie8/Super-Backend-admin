@@ -5,6 +5,7 @@ import com.sppart.admin.exhibition.domain.entity.Exhibition;
 import com.sppart.admin.exhibition.domain.mapper.ExhibitionMapper;
 import com.sppart.admin.exhibition.dto.ExhibitionByCondition;
 import com.sppart.admin.exhibition.dto.ExhibitionSearchCondition;
+import com.sppart.admin.exhibition.dto.ExhibitionWithParticipatedProducts;
 import com.sppart.admin.exhibition.dto.RequestUpdateExhibitionDisplay;
 import com.sppart.admin.exhibition.dto.ResponseBulkDeleteByIds;
 import com.sppart.admin.exhibition.dto.ResponseExhibitionByCondition;
@@ -87,5 +88,14 @@ public class ExhibitionServiceImpl implements ExhibitionService {
                 .orElseThrow(() -> new SuperpositionAdminException(ExhibitionErrorCode.NOT_FOUND));
         findExhibition.changeDisplay(req.getIsDisplay());
         exhibitionMapper.updateOnlyDisplay(exhibitionId, req.getIsDisplay());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ExhibitionWithParticipatedProducts getByIdWithParticipatedProducts(Long exhibitionId) {
+        ExhibitionWithParticipatedProducts exhibitionWithParticipatedProducts = exhibitionMapper.findByIdWithParticipatedProducts(
+                exhibitionId).orElseThrow(() -> new SuperpositionAdminException(ExhibitionErrorCode.NOT_FOUND));
+        exhibitionWithParticipatedProducts.sortProductsByProductId();
+        return exhibitionWithParticipatedProducts;
     }
 }

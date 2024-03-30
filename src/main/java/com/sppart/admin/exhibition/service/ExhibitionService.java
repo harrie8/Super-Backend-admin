@@ -1,6 +1,7 @@
 package com.sppart.admin.exhibition.service;
 
 import com.sppart.admin.exhibition.dto.ExhibitionSearchCondition;
+import com.sppart.admin.exhibition.dto.ExhibitionWithParticipatedProducts;
 import com.sppart.admin.exhibition.dto.RequestUpdateExhibitionDisplay;
 import com.sppart.admin.exhibition.dto.ResponseBulkDeleteByIds;
 import com.sppart.admin.exhibition.dto.ResponseGetExhibitionsByCondition;
@@ -13,4 +14,6 @@ public interface ExhibitionService {
     ResponseBulkDeleteByIds bulkDeleteByIds(Set<Long> ids);
 
     void updateOnlyDisplay(Long exhibitionId, RequestUpdateExhibitionDisplay req);
+
+    ExhibitionWithParticipatedProducts getByIdWithParticipatedProducts(Long exhibitionId);
 }

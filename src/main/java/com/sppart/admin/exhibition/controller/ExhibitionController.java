@@ -1,9 +1,11 @@
 package com.sppart.admin.exhibition.controller;
 
 import com.sppart.admin.exhibition.dto.ExhibitionSearchCondition;
+import com.sppart.admin.exhibition.dto.ExhibitionWithParticipatedProducts;
 import com.sppart.admin.exhibition.dto.RequestUpdateExhibitionDisplay;
 import com.sppart.admin.exhibition.dto.ResponseBulkDeleteByIds;
 import com.sppart.admin.exhibition.dto.ResponseGetExhibitionsByCondition;
+import com.sppart.admin.exhibition.dto.response.ResponseExhibitionWithParticipatedProducts;
 import com.sppart.admin.exhibition.service.ExhibitionService;
 import java.time.LocalDate;
 import java.util.Set;
@@ -58,10 +60,19 @@ public class ExhibitionController {
 
     // todo 권한 설정하기
     @PatchMapping("/{exhibitionId}")
-    public ResponseEntity<String> updateDisplay(@PathVariable Long exhibitionId,
-                                                @Valid @RequestBody RequestUpdateExhibitionDisplay req) {
+    @ResponseStatus(HttpStatus.OK)
+    public String updateDisplay(@PathVariable Long exhibitionId,
+                                @Valid @RequestBody RequestUpdateExhibitionDisplay req) {
         exhibitionService.updateOnlyDisplay(exhibitionId, req);
 
-        return ResponseEntity.ok("display update success");
+        return "display update success";
+    }
+
+    @GetMapping("/{exhibitionId}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseExhibitionWithParticipatedProducts getByIdWithParticipatedProducts(@PathVariable Long exhibitionId) {
+        ExhibitionWithParticipatedProducts result = exhibitionService.getByIdWithParticipatedProducts(
+                exhibitionId);
+        return ResponseExhibitionWithParticipatedProducts.from(result);
     }
 }

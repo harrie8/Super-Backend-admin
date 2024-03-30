@@ -80,4 +80,45 @@
         SET is_display = #{isDisplay}
         WHERE exhibition_id = #{exhibitionId};
     </update>
+
+    <resultMap id="findByIdWithParticipatedProductsMap"
+               type="com.sppart.admin.exhibition.dto.ExhibitionWithParticipatedProducts">
+        <id column="exhibition_id" property="exhibitionId"/>
+        <result column="title" property="title"/>
+        <result column="subHeading" property="subHeading"/>
+        <result column="location" property="location"/>
+        <result column="start_date" property="startDate"/>
+        <result column="end_Date" property="endDate"/>
+        <result column="status" property="status"/>
+        <result column="poster" property="poster"/>
+        <collection property="products" ofType="com.sppart.admin.product.dto.ProductForSpecificExhibition">
+            <id column="product_id" property="productId"/>
+            <result column="product_title" property="title"/>
+            <result column="basic_view" property="basicView"/>
+            <result column="qr_view" property="qrView"/>
+            <result column="like_count" property="likeCount"/>
+            <result column="order_count" property="orderCount"/>
+        </collection>
+    </resultMap>
+
+    <select id="findByIdWithParticipatedProducts" parameterType="Long" resultMap="findByIdWithParticipatedProductsMap">
+        SELECT exhi.exhibition_id,
+               exhi.title,
+               exhi.subHeading,
+               exhi.start_date,
+               exhi.end_Date,
+               exhi.location,
+               exhi.status,
+               exhi.poster,
+               pro.product_id AS product_id,
+               pro.title      AS product_title,
+               pro.basic_view,
+               pro.qr_view,
+               pro.like_count,
+               pro.order_count
+        FROM exhibition AS exhi
+                 LEFT OUTER JOIN product_exhibition AS pe ON pe.exhibition_id = exhi.exhibition_id
+                 LEFT OUTER JOIN product AS pro ON pro.product_id = pe.product_id
+        WHERE exhi.exhibition_id = #{exhibitionId};
+    </select>
 </mapper>

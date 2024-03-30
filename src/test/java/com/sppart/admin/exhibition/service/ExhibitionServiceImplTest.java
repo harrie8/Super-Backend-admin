@@ -2,10 +2,15 @@ package com.sppart.admin.exhibition.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.groups.Tuple.tuple;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.sppart.admin.exhibition.domain.entity.ExhibitionStatus;
+import com.sppart.admin.exhibition.domain.mapper.ExhibitionMapper;
 import com.sppart.admin.exhibition.dto.ExhibitionSearchCondition;
+import com.sppart.admin.productexhibition.mapper.ProductExhibitionMapper;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.DisplayName;
@@ -20,6 +25,10 @@ class ExhibitionServiceImplTest {
 
     @Autowired
     private ExhibitionService exhibitionService;
+    @Autowired
+    private ExhibitionMapper exhibitionMapper;
+    @Autowired
+    private ProductExhibitionMapper productExhibitionMapper;
 
     private final String[] extracting = {"title",
             "subHeading",
@@ -178,6 +187,49 @@ class ExhibitionServiceImplTest {
                 .containsExactlyInAnyOrder(
                         id2Exhibition()
                 );
+    }
+
+    @Test
+    @DisplayName("전시 ID들로 전시들을 삭제하는 테스트")
+    void bulkDeleteByIdsTest() {
+        //given
+        var ids = Set.of(1L, 2L);
+        var beforeExhibitionCount = exhibitionMapper.countAll();
+        var beforeProductExhibitionCount = productExhibitionMapper.countAll();
+
+        //when
+        var actual = exhibitionService.bulkDeleteByIds(ids);
+
+        //then
+        var afterExhibitionCount = exhibitionMapper.countAll();
+        var afterProductExhibitionCount = productExhibitionMapper.countAll();
+        assertAll(() -> {
+            assertEquals(ids.size(), actual.getExhibitionDeleteCount());
+            assertEquals(beforeExhibitionCount, afterExhibitionCount + ids.size());
+            assertEquals(beforeProductExhibitionCount, afterProductExhibitionCount + 5);
+        });
+    }
+
+    @Test
+    @DisplayName("전시 ID가 없다면 전시와 작품전시를 삭제하지 않는 테스트")
+    void bulkDeleteByNoIdsTest() {
+        //given
+        var ids = new HashSet<Long>();
+        var beforeExhibitionCount = exhibitionMapper.countAll();
+        var beforeProductExhibitionCount = productExhibitionMapper.countAll();
+
+        //when
+        var actual = exhibitionService.bulkDeleteByIds(ids);
+
+        //then
+        var afterExhibitionCount = exhibitionMapper.countAll();
+        var afterProductExhibitionCount = productExhibitionMapper.countAll();
+        assertAll(() -> {
+            assertEquals(ids.size(), actual.getProductExhibitionDeleteCount());
+            assertEquals(ids.size(), actual.getExhibitionDeleteCount());
+            assertEquals(beforeExhibitionCount, afterExhibitionCount);
+            assertEquals(beforeProductExhibitionCount, afterProductExhibitionCount);
+        });
     }
 
     private Tuple id1Exhibition() {

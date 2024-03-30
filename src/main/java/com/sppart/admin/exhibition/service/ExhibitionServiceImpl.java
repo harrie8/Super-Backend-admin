@@ -3,10 +3,13 @@ package com.sppart.admin.exhibition.service;
 import com.sppart.admin.exhibition.domain.mapper.ExhibitionMapper;
 import com.sppart.admin.exhibition.dto.ExhibitionByCondition;
 import com.sppart.admin.exhibition.dto.ExhibitionSearchCondition;
+import com.sppart.admin.exhibition.dto.ResponseBulkDeleteByIds;
 import com.sppart.admin.exhibition.dto.ResponseExhibitionByCondition;
 import com.sppart.admin.exhibition.dto.ResponseGetExhibitionsByCondition;
 import com.sppart.admin.product.dto.ProductOnlyArtistNameDto;
+import com.sppart.admin.productexhibition.mapper.ProductExhibitionMapper;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ExhibitionServiceImpl implements ExhibitionService {
 
     private final ExhibitionMapper exhibitionMapper;
+    private final ProductExhibitionMapper productExhibitionMapper;
 
     // todo 성능 체크 해보기 -> join vs domain 별로 db 접근
     @Override
@@ -55,6 +59,20 @@ public class ExhibitionServiceImpl implements ExhibitionService {
                 .totalCount(totalCount)
                 .findResultCount(findExhibitions.size())
                 .findExhibitions(findExhibitions)
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public ResponseBulkDeleteByIds bulkDeleteByIds(Set<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return ResponseBulkDeleteByIds.zero();
+        }
+        int productExhibitionDeleteCount = productExhibitionMapper.bulkDeleteByExhibitionIds(ids);
+        int exhibitionDeleteCount = exhibitionMapper.bulkDeleteByIds(ids);
+        return ResponseBulkDeleteByIds.builder()
+                .exhibitionDeleteCount(exhibitionDeleteCount)
+                .productExhibitionDeleteCount(productExhibitionDeleteCount)
                 .build();
     }
 }

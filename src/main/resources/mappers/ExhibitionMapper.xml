@@ -55,4 +55,17 @@
         SELECT COUNT(*)
         FROM exhibition;
     </select>
+
+    <delete id="bulkDeleteByIds">
+        <if test="ids != null and !ids.isEmpty()">
+            DELETE
+            FROM exhibition
+            <where>
+                AND exhibition_id IN
+                <foreach collection="ids" item="id" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </where>
+        </if>
+    </delete>
 </mapper>

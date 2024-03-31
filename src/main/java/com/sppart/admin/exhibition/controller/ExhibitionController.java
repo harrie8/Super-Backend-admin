@@ -5,6 +5,7 @@ import com.sppart.admin.exhibition.dto.ExhibitionWithParticipatedProducts;
 import com.sppart.admin.exhibition.dto.RequestUpdateExhibitionDisplay;
 import com.sppart.admin.exhibition.dto.ResponseBulkDeleteByIds;
 import com.sppart.admin.exhibition.dto.ResponseGetExhibitionsByCondition;
+import com.sppart.admin.exhibition.dto.request.RequestCreateExhibition;
 import com.sppart.admin.exhibition.dto.response.ResponseExhibitionWithParticipatedProducts;
 import com.sppart.admin.exhibition.service.ExhibitionService;
 import java.time.LocalDate;
@@ -13,16 +14,20 @@ import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -74,5 +79,14 @@ public class ExhibitionController {
         ExhibitionWithParticipatedProducts result = exhibitionService.getByIdWithParticipatedProducts(
                 exhibitionId);
         return ResponseExhibitionWithParticipatedProducts.from(result);
+    }
+
+    // todo 전시 수정 피그마 페이지 없음
+
+    // todo 권한 설정하기
+    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    @ResponseStatus(HttpStatus.CREATED)
+    public void createExhibition(@Valid @RequestPart RequestCreateExhibition req, @RequestPart MultipartFile poster) {
+        exhibitionService.create(req, poster);
     }
 }

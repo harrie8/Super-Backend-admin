@@ -121,4 +121,10 @@
                  LEFT OUTER JOIN product AS pro ON pro.product_id = pe.product_id
         WHERE exhi.exhibition_id = #{exhibitionId};
     </select>
+
+    <insert id="save" parameterType="com.sppart.admin.exhibition.domain.entity.Exhibition" useGeneratedKeys="true"
+            keyProperty="id">
+        INSERT INTO exhibition(title, subHeading, start_date, end_date, location, status, poster, is_display)
+        VALUES (#{title}, #{subHeading}, #{startDate}, #{endDate}, #{location}, #{status}, #{poster}, #{isDisplay});
+    </insert>
 </mapper>

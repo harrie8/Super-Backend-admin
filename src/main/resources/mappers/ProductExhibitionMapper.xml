@@ -19,4 +19,20 @@
         SELECT COUNT(*)
         FROM product_exhibition;
     </select>
+
+    <insert id="bulkInsertByExhibitionId">
+        <if test="exhibitionId != null and productIds != null and !productIds.isEmpty()">
+            INSERT INTO product_exhibition(product_id, exhibition_id)
+            VALUES
+            <foreach collection="productIds" item="productId" open="(" close=")" separator="), (">
+                #{productId}, #{exhibitionId}
+            </foreach>
+        </if>
+    </insert>
+
+    <select id="findByExhibitionId" resultType="com.sppart.admin.productexhibition.dto.ProductExhibitionDto">
+        SELECT *
+        FROM product_exhibition
+        WHERE exhibition_id = #{exhibitionId};
+    </select>
 </mapper>

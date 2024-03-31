@@ -2,6 +2,7 @@ package com.sppart.admin.exhibition.service;
 
 import com.sppart.admin.exception.SuperpositionAdminException;
 import com.sppart.admin.exhibition.domain.entity.Exhibition;
+import com.sppart.admin.exhibition.domain.entity.ExhibitionStatus;
 import com.sppart.admin.exhibition.domain.mapper.ExhibitionMapper;
 import com.sppart.admin.exhibition.dto.ExhibitionByCondition;
 import com.sppart.admin.exhibition.dto.ExhibitionSearchCondition;
@@ -10,6 +11,7 @@ import com.sppart.admin.exhibition.dto.RequestUpdateExhibitionDisplay;
 import com.sppart.admin.exhibition.dto.ResponseBulkDeleteByIds;
 import com.sppart.admin.exhibition.dto.ResponseExhibitionByCondition;
 import com.sppart.admin.exhibition.dto.ResponseGetExhibitionsByCondition;
+import com.sppart.admin.exhibition.dto.request.RequestCreateExhibition;
 import com.sppart.admin.exhibition.exception.ExhibitionErrorCode;
 import com.sppart.admin.product.dto.ProductOnlyArtistNameDto;
 import com.sppart.admin.productexhibition.mapper.ProductExhibitionMapper;
@@ -19,6 +21,7 @@ import java.util.function.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -97,5 +100,27 @@ public class ExhibitionServiceImpl implements ExhibitionService {
                 exhibitionId).orElseThrow(() -> new SuperpositionAdminException(ExhibitionErrorCode.NOT_FOUND));
         exhibitionWithParticipatedProducts.sortProductsByProductId();
         return exhibitionWithParticipatedProducts;
+    }
+
+    @Override
+    @Transactional
+    public long create(RequestCreateExhibition req, MultipartFile poster) {
+        // todo object Storage에 poster 저장하기
+
+        Exhibition exhibition = Exhibition.builder()
+                .title(req.getTitle())
+                .subHeading(req.getSubHeading())
+                .location(req.getLocation())
+                .startDate(req.getStartDate())
+                .endDate(req.getEndDate())
+                .status(ExhibitionStatus.findByName(req.getStatus()))
+                .poster(poster.getOriginalFilename())
+                .isDisplay(0)
+                .build();
+        exhibitionMapper.save(exhibition);
+
+        productExhibitionMapper.bulkInsertByExhibitionId(exhibition.getId(), req.getProductIds());
+
+        return exhibition.getId();
     }
 }

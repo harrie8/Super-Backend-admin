@@ -5,7 +5,9 @@ import com.sppart.admin.exhibition.dto.ExhibitionWithParticipatedProducts;
 import com.sppart.admin.exhibition.dto.RequestUpdateExhibitionDisplay;
 import com.sppart.admin.exhibition.dto.ResponseBulkDeleteByIds;
 import com.sppart.admin.exhibition.dto.ResponseGetExhibitionsByCondition;
+import com.sppart.admin.exhibition.dto.request.RequestCreateExhibition;
 import java.util.Set;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface ExhibitionService {
 
@@ -16,4 +18,6 @@ public interface ExhibitionService {
     void updateOnlyDisplay(Long exhibitionId, RequestUpdateExhibitionDisplay req);
 
     ExhibitionWithParticipatedProducts getByIdWithParticipatedProducts(Long exhibitionId);
+
+    long create(RequestCreateExhibition req, MultipartFile poster);
 }

@@ -25,4 +25,6 @@ public interface ExhibitionMapper {
 
     Optional<ExhibitionWithParticipatedProducts> findByIdWithParticipatedProducts(
             @Param("exhibitionId") Long exhibitionId);
+
+    void save(Exhibition exhibition);
 }

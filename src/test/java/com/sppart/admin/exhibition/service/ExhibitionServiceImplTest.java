@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.groups.Tuple.tuple;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.sppart.admin.exception.SuperpositionAdminException;
@@ -11,7 +12,9 @@ import com.sppart.admin.exhibition.domain.entity.ExhibitionStatus;
 import com.sppart.admin.exhibition.domain.mapper.ExhibitionMapper;
 import com.sppart.admin.exhibition.dto.ExhibitionSearchCondition;
 import com.sppart.admin.exhibition.dto.RequestUpdateExhibitionDisplay;
+import com.sppart.admin.exhibition.dto.request.RequestCreateExhibition;
 import com.sppart.admin.productexhibition.mapper.ProductExhibitionMapper;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
@@ -20,6 +23,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
@@ -346,6 +350,47 @@ class ExhibitionServiceImplTest {
         //expected
         assertThrows(SuperpositionAdminException.class,
                 () -> exhibitionService.getByIdWithParticipatedProducts(notExistsExhibitionId));
+    }
+
+    @Test
+    @DisplayName("전시에 참여한 작품들이 없는 전시 상세 조회 시 전시 상세 정보만 반환하는 테스트")
+    void createTest() {
+        //given
+        var req = RequestCreateExhibition.builder()
+                .title("제목입니다.")
+                .subHeading("부제목입니다.")
+                .startDate(LocalDate.parse("2024-01-01"))
+                .endDate(LocalDate.parse("2024-05-01"))
+                .location("장소입니다.")
+                .status(ExhibitionStatus.current.name())
+                .productIds(Set.of(1L, 2L, 3L))
+                .build();
+        var poster = new MockMultipartFile("file", "test.txt", "text/plain",
+                "test file".getBytes(StandardCharsets.UTF_8));
+
+        //when
+        var createdExhibitionId = exhibitionService.create(req, poster);
+
+        //then
+        var actual = exhibitionMapper.findById(createdExhibitionId).get();
+        var productExhibitions = productExhibitionMapper.findByExhibitionId(createdExhibitionId);
+        assertAll(() -> {
+            assertEquals(req.getTitle(), actual.getTitle());
+            assertEquals(req.getSubHeading(), actual.getSubHeading());
+            assertEquals(req.getLocation(), actual.getLocation());
+            assertEquals(req.getStartDate(), actual.getStartDate());
+            assertEquals(req.getEndDate(), actual.getEndDate());
+            assertEquals(ExhibitionStatus.findByName(req.getStatus()), actual.getStatus());
+            assertNotNull(actual.getPoster());
+            assertThat(productExhibitions)
+                    .hasSize(3)
+                    .extracting("productId", "exhibitionId")
+                    .containsExactlyInAnyOrder(
+                            tuple(1L, createdExhibitionId),
+                            tuple(2L, createdExhibitionId),
+                            tuple(3L, createdExhibitionId)
+                    );
+        });
     }
 
     private Tuple id1Exhibition() {

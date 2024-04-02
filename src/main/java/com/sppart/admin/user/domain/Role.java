@@ -1,8 +1,8 @@
 package com.sppart.admin.user.domain;
 
 public enum Role {
+    SUPER_ADMIN,
     ADMIN,
-    MANAGER,
     GUEST,
     ;
 

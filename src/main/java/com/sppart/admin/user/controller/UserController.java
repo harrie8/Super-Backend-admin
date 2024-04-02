@@ -36,7 +36,7 @@ public class UserController {
         return ResponseEntity.ok(loginResponse);
     }
 
-    @Auth(roles = {Role.ADMIN, Role.MANAGER, Role.GUEST})
+    @Auth(roles = {Role.SUPER_ADMIN, Role.ADMIN, Role.GUEST})
     @GetMapping("/logout")
     @ResponseStatus(HttpStatus.OK)
     public void logout(HttpServletRequest request) {

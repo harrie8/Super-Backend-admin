@@ -1,9 +1,11 @@
 package com.sppart.admin.member.domain.entity;
 
 import com.sppart.admin.utils.Gender;
+import lombok.Getter;
 
 import java.sql.Timestamp;
 
+@Getter
 public class Member {
     private String email;
     private String name;

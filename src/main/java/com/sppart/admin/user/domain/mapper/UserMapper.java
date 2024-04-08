@@ -8,5 +8,5 @@ import org.apache.ibatis.annotations.Param;
 @Mapper
 public interface UserMapper {
 
-    Optional<Users> getUserById(@Param("id") String id);
+    Optional<Users> findById(@Param("id") String id);
 }

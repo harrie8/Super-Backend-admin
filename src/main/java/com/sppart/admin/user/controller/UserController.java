@@ -1,10 +1,10 @@
 package com.sppart.admin.user.controller;
 
-import com.sppart.admin.user.domain.Role;
+import com.sppart.admin.user.domain.Users;
+import com.sppart.admin.user.dto.CurrentUser;
 import com.sppart.admin.user.dto.LoginDto;
 import com.sppart.admin.user.dto.LoginRequest;
 import com.sppart.admin.user.dto.LoginResponse;
-import com.sppart.admin.user.interceptor.Auth;
 import com.sppart.admin.user.service.UserService;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -36,10 +36,9 @@ public class UserController {
         return ResponseEntity.ok(loginResponse);
     }
 
-    @Auth(roles = {Role.SUPER_ADMIN, Role.ADMIN, Role.GUEST})
     @GetMapping("/logout")
     @ResponseStatus(HttpStatus.OK)
-    public void logout(HttpServletRequest request) {
+    public void logout(@CurrentUser Users users, HttpServletRequest request) {
         userService.logout(request);
     }
 }

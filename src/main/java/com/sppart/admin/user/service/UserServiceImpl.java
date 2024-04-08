@@ -1,6 +1,7 @@
 package com.sppart.admin.user.service;
 
 import com.sppart.admin.exception.SuperpositionAdminException;
+import com.sppart.admin.user.domain.Accessor;
 import com.sppart.admin.user.domain.Users;
 import com.sppart.admin.user.domain.mapper.UserMapper;
 import com.sppart.admin.user.dto.LoginDto;
@@ -25,16 +26,20 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public LoginResponse login(LoginDto dto) {
-        Users userById = userMapper.getUserById(dto.getLoginId())
+        Users findUser = userMapper.findById(dto.getLoginId())
                 .orElseThrow(() -> new SuperpositionAdminException(UserErrorCode.ID_OR_PW_NOT_VALID));
-        checkPassword(dto.getLoginPassword(), userById.getPassword());
+        validPassword(dto.getLoginPassword(), findUser.getPassword());
 
         HttpServletRequest httpServletRequest = dto.getHttpServletRequest();
         HttpSession session = httpServletRequest.getSession();
-        session.setAttribute(SessionConst.LOGIN_USER, userById);
+        Accessor accessor = Accessor.builder()
+                .id(findUser.getId())
+                .role(findUser.getRole())
+                .build();
+        session.setAttribute(SessionConst.LOGIN_USER, accessor);
 
         return LoginResponse.builder()
-                .users(userById)
+                .user(findUser)
                 .message("success")
                 .build();
     }
@@ -45,7 +50,7 @@ public class UserServiceImpl implements UserService {
         session.invalidate();
     }
 
-    private void checkPassword(String rawPassword, String encodedPassword) {
+    private void validPassword(String rawPassword, String encodedPassword) {
         if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
             throw new SuperpositionAdminException(UserErrorCode.ID_OR_PW_NOT_VALID);
         }

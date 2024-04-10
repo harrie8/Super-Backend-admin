@@ -1,7 +1,9 @@
 package com.sppart.admin.user.domain;
 
+import java.util.Collection;
 import lombok.Builder;
 import lombok.Getter;
+import org.springframework.security.core.GrantedAuthority;
 
 @Getter
 public class Accessor {
@@ -13,5 +15,9 @@ public class Accessor {
     public Accessor(String id, Role role) {
         this.id = id;
         this.role = role;
+    }
+
+    public Collection<? extends GrantedAuthority> getGrantedAuthorities() {
+        return role.getGrantedAuthorities();
     }
 }

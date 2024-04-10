@@ -37,6 +37,7 @@ public class UserServiceImpl implements UserService {
                 .role(findUser.getRole())
                 .build();
         session.setAttribute(SessionConst.LOGIN_USER, accessor);
+        session.setMaxInactiveInterval(SessionConst.DEFAULT_TIME_OUT_SECONDS);
 
         return LoginResponse.builder()
                 .user(findUser)

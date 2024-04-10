@@ -40,7 +40,7 @@ public class UserServiceImpl implements UserService {
         session.setMaxInactiveInterval(SessionConst.DEFAULT_TIME_OUT_SECONDS);
 
         return LoginResponse.builder()
-                .user(findUser)
+                .userInfo(findUser)
                 .message("success")
                 .build();
     }

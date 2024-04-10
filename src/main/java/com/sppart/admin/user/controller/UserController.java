@@ -25,8 +25,8 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest,
-                                               HttpServletRequest httpServletRequest) {
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest,
+                                   HttpServletRequest httpServletRequest) {
         LoginDto loginDto = LoginDto.builder()
                 .loginRequest(loginRequest)
                 .httpServletRequest(httpServletRequest)

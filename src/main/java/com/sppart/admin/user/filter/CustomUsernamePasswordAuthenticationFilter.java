@@ -2,6 +2,7 @@ package com.sppart.admin.user.filter;
 
 import com.sppart.admin.user.domain.Accessor;
 import com.sppart.admin.utils.SessionConst;
+import com.sppart.admin.utils.SessionErrorCode;
 import java.io.IOException;
 import java.util.Arrays;
 import javax.servlet.FilterChain;
@@ -37,11 +38,17 @@ public class CustomUsernamePasswordAuthenticationFilter extends OncePerRequestFi
         HttpSession session = request.getSession(false);
         if (isEmptySession(session)) {
             log.error("세션이 비어 있는 오류");
-            sendErrorResponse(response, 400, "세션이 비어 있습니다.");
+            sendErrorResponse(response, SessionErrorCode.EMPTY_SESSION.getHttpStatus().value(),
+                    SessionErrorCode.EMPTY_SESSION.getMessage());
             return;
         }
         Object sessionAttribute = getSessionAttribute(session);
         if (!(sessionAttribute instanceof Accessor accessor)) {
+            Arrays.stream(request.getCookies())
+                    .filter(cookie -> cookie.getName().equals("JSESSIONID"))
+                    .findFirst()
+                    .ifPresent(cookie -> log.info("cookie.getName() = {}, cookie.getValue() = {}", cookie.getName(),
+                            cookie.getValue()));
             log.error("세션에 Accessor 객체가 아닌 {} 값이 설정되어 있음", sessionAttribute);
             sendErrorResponse(response, 400, "세션에 " + sessionAttribute + " 값이 설정되어 있습니다.");
             return;

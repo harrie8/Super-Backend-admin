@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum SessionErrorCode implements ErrorCode {
 
+    EMPTY_SESSION(HttpStatus.BAD_REQUEST, "세션이 비어 있습니다."),
     INVALID_SESSION_VALUE(HttpStatus.BAD_REQUEST, "세션 저장 값이 올바르지 않습니다."),
     ;
 

@@ -25,7 +25,8 @@ public class CustomUsernamePasswordAuthenticationFilter extends OncePerRequestFi
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        String[] excludePath = {"/user/signup", "/users/login", "/user/reissue"};
+        String[] excludePath = {"/user/signup", "/users/login", "/user/reissue", "/swagger-ui", "/v3/api-docs",
+                "/swagger-resources"};
         String path = request.getRequestURI();
         return Arrays.stream(excludePath).anyMatch(path::startsWith);
     }

@@ -1,11 +1,11 @@
 package com.sppart.admin.user.controller;
 
-import com.sppart.admin.user.domain.Users;
 import com.sppart.admin.user.dto.CurrentUser;
 import com.sppart.admin.user.dto.LoginDto;
 import com.sppart.admin.user.dto.LoginRequest;
 import com.sppart.admin.user.dto.LoginResponse;
 import com.sppart.admin.user.service.UserService;
+import io.swagger.annotations.ApiParam;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +37,7 @@ public class UserController {
 
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.OK)
-    public void logout(@CurrentUser Users users, HttpServletRequest request) {
+    public void logout(@ApiParam(hidden = true) @CurrentUser String id, HttpServletRequest request) {
         userService.logout(request);
     }
 }

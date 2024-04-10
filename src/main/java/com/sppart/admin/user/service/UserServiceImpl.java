@@ -30,14 +30,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new SuperpositionAdminException(UserErrorCode.ID_OR_PW_NOT_VALID));
         validPassword(dto.getLoginPassword(), findUser.getPassword());
 
-        HttpServletRequest httpServletRequest = dto.getHttpServletRequest();
-        HttpSession session = httpServletRequest.getSession();
-        Accessor accessor = Accessor.builder()
-                .id(findUser.getId())
-                .role(findUser.getRole())
-                .build();
-        session.setAttribute(SessionConst.LOGIN_USER, accessor);
-        session.setMaxInactiveInterval(SessionConst.DEFAULT_TIME_OUT_SECONDS);
+        setSession(dto.getHttpServletRequest(), findUser);
 
         return LoginResponse.builder()
                 .userInfo(findUser)
@@ -55,5 +48,15 @@ public class UserServiceImpl implements UserService {
         if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
             throw new SuperpositionAdminException(UserErrorCode.ID_OR_PW_NOT_VALID);
         }
+    }
+
+    private void setSession(HttpServletRequest httpServletRequest, Users findUser) {
+        HttpSession session = httpServletRequest.getSession();
+        Accessor accessor = Accessor.builder()
+                .id(findUser.getId())
+                .role(findUser.getRole())
+                .build();
+        session.setAttribute(SessionConst.LOGIN_USER, accessor);
+        session.setMaxInactiveInterval(SessionConst.DEFAULT_TIME_OUT_SECONDS);
     }
 }

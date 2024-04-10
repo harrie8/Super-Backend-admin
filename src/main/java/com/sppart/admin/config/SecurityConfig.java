@@ -1,12 +1,15 @@
 package com.sppart.admin.config;
 
+import com.sppart.admin.user.filter.CustomAccessDeniedHandler;
 import com.sppart.admin.user.filter.CustomUsernamePasswordAuthenticationFilter;
+import com.sppart.admin.user.filter.CustomeAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -14,6 +17,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final CustomeAuthenticationEntryPoint customAuthenticationEntryPoint;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
     @Bean
     public WebSecurityCustomizer ignoringCustomizer() {
@@ -32,12 +38,20 @@ public class SecurityConfig {
                 .and()
                 .cors()
 
+                .and()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+
                 .and().authorizeHttpRequests()
                 .antMatchers("/users/login").permitAll()
-//                .antMatchers("/users/password").hasAnyAuthority("SUPER_ADMIN") // 권한 확인
+//                .antMatchers("/users/password").hasAuthority("MANAGE_PW") // 권한 확인
 //                .antMatchers("/**").permitAll()
                 .anyRequest().authenticated()
 
+                .and()
+                .exceptionHandling()
+                .authenticationEntryPoint(customAuthenticationEntryPoint)
+                .accessDeniedHandler(customAccessDeniedHandler)
                 .and()
                 .addFilterBefore(new CustomUsernamePasswordAuthenticationFilter(),
                         UsernamePasswordAuthenticationFilter.class);

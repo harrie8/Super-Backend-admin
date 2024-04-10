@@ -2,7 +2,6 @@ package com.sppart.admin.user.filter;
 
 import com.sppart.admin.user.domain.Accessor;
 import com.sppart.admin.utils.SessionConst;
-import com.sppart.admin.utils.SessionErrorCode;
 import java.io.IOException;
 import java.util.Arrays;
 import javax.servlet.FilterChain;
@@ -35,42 +34,52 @@ public class CustomUsernamePasswordAuthenticationFilter extends OncePerRequestFi
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        HttpSession session = request.getSession(false);
-        if (isEmptySession(session)) {
-            log.error("세션이 비어 있는 오류");
-            sendErrorResponse(response, SessionErrorCode.EMPTY_SESSION.getHttpStatus().value(),
-                    SessionErrorCode.EMPTY_SESSION.getMessage());
-            return;
+        try {
+            HttpSession session = getHttpSession(request);
+            Accessor accessor = getAccessor(request, session);
+            setAuthentication(accessor);
+        } catch (IllegalStateException e) {
+            log.error("세션 오류");
         }
-        Object sessionAttribute = getSessionAttribute(session);
-        if (!(sessionAttribute instanceof Accessor accessor)) {
-            Arrays.stream(request.getCookies())
-                    .filter(cookie -> cookie.getName().equals("JSESSIONID"))
-                    .findFirst()
-                    .ifPresent(cookie -> log.info("cookie.getName() = {}, cookie.getValue() = {}", cookie.getName(),
-                            cookie.getValue()));
-            log.error("세션에 Accessor 객체가 아닌 {} 값이 설정되어 있음", sessionAttribute);
-            sendErrorResponse(response, 400, "세션에 " + sessionAttribute + " 값이 설정되어 있습니다.");
-            return;
-        }
-
-        UserDetails principal = new User(accessor.getId(), "", accessor.getGrantedAuthorities());
-        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
-                principal, "", accessor.getRole().getGrantedAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
 
         filterChain.doFilter(request, response);
     }
 
-    private void sendErrorResponse(HttpServletResponse response, int sc, String msg) throws IOException {
-        response.sendError(sc, msg);
+    private HttpSession getHttpSession(HttpServletRequest request) throws IllegalStateException {
+        HttpSession session = request.getSession(false);
+        if (isEmptySession(session)) {
+            log.error("세션이 비어 있는 오류");
+            throw new IllegalStateException();
+        }
+        return session;
     }
 
     private boolean isEmptySession(HttpSession session) {
         return session == null;
     }
 
-    private Object getSessionAttribute(HttpSession session) {
-        return session.getAttribute(SessionConst.LOGIN_USER);
+    private Accessor getAccessor(HttpServletRequest request, HttpSession session) throws IllegalStateException {
+        Object sessionAttribute = session.getAttribute(SessionConst.LOGIN_USER);
+        if (!(sessionAttribute instanceof Accessor accessor)) {
+            printCookie(request);
+            log.error("세션에 Accessor 객체가 아닌 {} 값이 설정되어 있음", sessionAttribute);
+            throw new IllegalStateException();
+        }
+        return accessor;
+    }
+
+    private void printCookie(HttpServletRequest request) {
+        Arrays.stream(request.getCookies())
+                .filter(cookie -> cookie.getName().equals("JSESSIONID"))
+                .findFirst()
+                .ifPresent(cookie -> log.info("cookie.getName() = {}, cookie.getValue() = {}", cookie.getName(),
+                        cookie.getValue()));
+    }
+
+    private void setAuthentication(Accessor accessor) {
+        UserDetails principal = new User(accessor.getId(), "", accessor.getGrantedAuthorities());
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+                principal, "", accessor.getRole().getGrantedAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
     }
 }

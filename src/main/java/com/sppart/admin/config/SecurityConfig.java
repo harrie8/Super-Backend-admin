@@ -34,9 +34,9 @@ public class SecurityConfig {
 
                 .and().authorizeHttpRequests()
                 .antMatchers("/users/login").permitAll()
-                .antMatchers("/users/logout").authenticated()
+//                .antMatchers("/users/password").hasAnyAuthority("SUPER_ADMIN") // 권한 확인
 //                .antMatchers("/**").permitAll()
-//                .anyRequest().authenticated();
+                .anyRequest().authenticated()
 
                 .and()
                 .addFilterBefore(new CustomUsernamePasswordAuthenticationFilter(),

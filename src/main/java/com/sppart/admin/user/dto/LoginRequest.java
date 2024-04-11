@@ -12,10 +12,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class LoginRequest {
 
-    @ApiModelProperty(value = "회원 ID", required = true)
+    @ApiModelProperty(value = "회원 ID", example = "admin", required = true)
     @NotBlank
     private String id;
-    @ApiModelProperty(value = "회원 PASSWORD", required = true)
+    @ApiModelProperty(value = "회원 PASSWORD", example = "sppart!@", required = true)
     @NotBlank
     private String password;
 

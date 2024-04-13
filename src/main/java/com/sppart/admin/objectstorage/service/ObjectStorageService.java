@@ -1,4 +1,4 @@
-package com.sppart.admin.upload.service;
+package com.sppart.admin.objectstorage.service;
 
 import java.util.List;
 import org.springframework.web.multipart.MultipartFile;

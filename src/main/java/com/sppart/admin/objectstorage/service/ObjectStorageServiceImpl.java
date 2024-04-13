@@ -1,4 +1,4 @@
-package com.sppart.admin.upload.service;
+package com.sppart.admin.objectstorage.service;
 
 import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3;

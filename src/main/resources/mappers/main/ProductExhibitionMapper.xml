@@ -30,7 +30,14 @@
         </if>
     </insert>
 
-    <select id="findByExhibitionId" resultType="com.sppart.admin.productexhibition.dto.ProductExhibitionDto">
+    <resultMap id="productExhibitionDto" type="com.sppart.admin.productexhibition.dto.ProductExhibitionDto">
+        <result column="product_id" property="productId"/>
+        <result column="exhibition_id" property="exhibitionId"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <select id="findByExhibitionId" resultMap="productExhibitionDto">
         SELECT *
         FROM product_exhibition
         WHERE exhibition_id = #{exhibitionId};

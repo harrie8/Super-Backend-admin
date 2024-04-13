@@ -1,7 +1,6 @@
 package com.sppart.admin.exhibition.dto.request;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 import java.util.Set;
 import javax.validation.constraints.NotBlank;
@@ -11,32 +10,32 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
-@ApiModel(description = "Schemas 탭에 `RequestCreateExhibition` 참고하시면 됩니다.")
+@Schema(description = "전시 생성 요청값")
 @Getter
 @NoArgsConstructor
 public class RequestCreateExhibition {
 
-    @ApiModelProperty(value = "전시 제목 - 필수", example = "제목입니다.", required = true)
+    @Schema(description = "전시 제목 - 필수", example = "제목입니다.", required = true)
     @NotBlank
     private String title;
-    @ApiModelProperty(value = "전시 부제목 - 필수", example = "부제목입니다.", required = true)
+    @Schema(description = "전시 부제목 - 필수", example = "부제목입니다.", required = true)
     @NotBlank
     private String subHeading;
-    @ApiModelProperty(value = "시작일 - 필수", required = true)
+    @Schema(description = "시작일 - 필수", required = true, type = "string")
     @NotNull
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate startDate;
-    @ApiModelProperty(value = "종료일 - 필수", required = true)
+    @Schema(description = "종료일 - 필수", required = true, type = "string")
     @NotNull
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate endDate;
-    @ApiModelProperty(value = "전시 장소 - 필수", example = "장소", required = true)
+    @Schema(description = "전시 장소 - 필수", example = "장소", required = true)
     @NotBlank
     private String location;
-    @ApiModelProperty(value = "전시 상태 - 필수", example = "current", required = true)
+    @Schema(description = "전시 상태 - 필수", example = "current", required = true)
     @NotNull
     private String status;
-    @ApiModelProperty(value = "전시에 참여할 작품 번호들", example = "[1,2,3]")
+    @Schema(description = "전시에 참여할 작품 번호들", example = "[1,2,3]")
     private Set<Long> productIds;
 
     @Builder

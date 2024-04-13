@@ -15,6 +15,7 @@ import com.sppart.admin.exhibition.dto.request.RequestCreateExhibition;
 import com.sppart.admin.exhibition.exception.ExhibitionErrorCode;
 import com.sppart.admin.product.dto.ProductOnlyArtistNameDto;
 import com.sppart.admin.productexhibition.mapper.ProductExhibitionMapper;
+import com.sppart.admin.upload.service.ObjectStorageService;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -29,6 +30,7 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 
     private final ExhibitionMapper exhibitionMapper;
     private final ProductExhibitionMapper productExhibitionMapper;
+    private final ObjectStorageService objectStorageService;
 
     // todo 성능 체크 해보기 -> join vs domain 별로 db 접근
     @Override
@@ -105,7 +107,7 @@ public class ExhibitionServiceImpl implements ExhibitionService {
     @Override
     @Transactional
     public long create(RequestCreateExhibition req, MultipartFile poster) {
-        // todo object Storage에 poster 저장하기
+        String url = objectStorageService.uploadFile(poster);
 
         Exhibition exhibition = Exhibition.builder()
                 .title(req.getTitle())
@@ -114,7 +116,7 @@ public class ExhibitionServiceImpl implements ExhibitionService {
                 .startDate(req.getStartDate())
                 .endDate(req.getEndDate())
                 .status(ExhibitionStatus.findByName(req.getStatus()))
-                .poster(poster.getOriginalFilename())
+                .poster(url)
                 .isDisplay(0)
                 .build();
         exhibitionMapper.save(exhibition);

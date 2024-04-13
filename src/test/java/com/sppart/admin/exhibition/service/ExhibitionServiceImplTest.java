@@ -14,28 +14,58 @@ import com.sppart.admin.exhibition.dto.ExhibitionSearchCondition;
 import com.sppart.admin.exhibition.dto.RequestUpdateExhibitionDisplay;
 import com.sppart.admin.exhibition.dto.request.RequestCreateExhibition;
 import com.sppart.admin.productexhibition.mapper.ProductExhibitionMapper;
+import com.sppart.admin.upload.service.ObjectStorageService;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestConstructor;
+import org.springframework.test.context.TestConstructor.AutowireMode;
+import org.springframework.web.multipart.MultipartFile;
 
 @SpringBootTest
+@TestConstructor(autowireMode = AutowireMode.ALL)
 @ActiveProfiles("test")
 class ExhibitionServiceImplTest {
 
-    @Autowired
-    private ExhibitionService exhibitionService;
-    @Autowired
-    private ExhibitionMapper exhibitionMapper;
-    @Autowired
-    private ProductExhibitionMapper productExhibitionMapper;
+    private final ExhibitionService exhibitionService;
+    private final ExhibitionMapper exhibitionMapper;
+    private final ProductExhibitionMapper productExhibitionMapper;
+
+    public ExhibitionServiceImplTest(ExhibitionMapper exhibitionMapper,
+                                     ProductExhibitionMapper productExhibitionMapper) {
+        this.exhibitionMapper = exhibitionMapper;
+        this.productExhibitionMapper = productExhibitionMapper;
+        this.exhibitionService = new ExhibitionServiceImpl(exhibitionMapper, productExhibitionMapper,
+                new ObjectStorageService() {
+                    @Override
+                    public String uploadFile(MultipartFile file) {
+                        return "";
+                    }
+
+                    @Override
+                    public List<String> uploadFiles(List<MultipartFile> files) {
+                        return List.of();
+                    }
+
+                    @Override
+                    public void delete(String url) {
+
+                    }
+
+                    @Override
+                    public void delete(List<String> urls) {
+
+                    }
+                });
+    }
 
     private final String[] extracting = {"title",
             "subHeading",

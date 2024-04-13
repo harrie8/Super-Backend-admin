@@ -383,7 +383,7 @@ class ExhibitionServiceImplTest {
     }
 
     @Test
-    @DisplayName("전시에 참여한 작품들이 없는 전시 상세 조회 시 전시 상세 정보만 반환하는 테스트")
+    @DisplayName("전시 생성 테스트")
     void createTest() {
         //given
         var req = RequestCreateExhibition.builder()

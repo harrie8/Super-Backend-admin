@@ -1,0 +1,98 @@
+package com.sppart.admin.product.controller;
+
+import com.sppart.admin.exhibition.dto.ExhibitionWithParticipatedProducts;
+import com.sppart.admin.exhibition.dto.ResponseBulkDeleteByIds;
+import com.sppart.admin.exhibition.dto.ResponseGetExhibitionsByCondition;
+import com.sppart.admin.exhibition.dto.request.RequestCreateExhibition;
+import com.sppart.admin.exhibition.dto.response.ResponseExhibitionWithParticipatedProducts;
+import com.sppart.admin.product.dto.ProductSearchCondition;
+import com.sppart.admin.product.dto.request.RequestGetProducts;
+import com.sppart.admin.product.dto.response.ResponseGetProductsWithTagsByCondition;
+import com.sppart.admin.product.dto.response.ResponseProductWithTags;
+import com.sppart.admin.product.service.ProductService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import java.util.Set;
+import javax.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+@Api(tags = "작품")
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/products")
+public class ProductController {
+
+    private final ProductService productService;
+
+    @ApiOperation(value = "작품 목록 - 검색 조건으로 작품 목록 조회", notes = "작품명, 작가명, 작품 코드 3가지 검색 조건으로 작품 목록을 조회하는 하는 API입니다.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "검색 조건으로 조회한 작품 목록을 반환합니다.", response = ResponseGetExhibitionsByCondition.class),
+    })
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseGetProductsWithTagsByCondition<ResponseProductWithTags> getExhibitionsByCondition(
+            @ModelAttribute RequestGetProducts req) {
+        ProductSearchCondition condition = ProductSearchCondition.builder()
+                .title(req.getTitle())
+                .artistName(req.getArtistName())
+                .productId(req.getProductId())
+                .build();
+
+        return productService.getProductsByCondition(condition);
+    }
+
+    @ApiOperation(value = "전시 목록 - 선택 삭제", notes = "삭제하고 싶은 전시 번호들로 전시들을 삭제하는 API입니다.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "전시 삭제 성공 - 삭제 성공한 전시의 개수를 반환합니다.", response = String.class),
+    })
+    @DeleteMapping
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<String> bulkDeleteByIds(@ApiParam(value = "삭제하고 싶은 전시 id들") @RequestParam Set<Long> ids) {
+        ResponseBulkDeleteByIds deleteCount = productService.bulkDeleteByIds(ids);
+
+        return ResponseEntity.ok(deleteCount.toString());
+    }
+
+    @ApiOperation(value = "전시 상세 - 전시 상세 조회", notes = "전시 정보와 해당 전시에 포함된 작품들 정보도 조회하는 API입니다.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "조회 성공", response = String.class),
+            @ApiResponse(code = 404, message = "존재하지 않는 전시", response = String.class),
+    })
+    @GetMapping("/{exhibitionId}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseExhibitionWithParticipatedProducts getByIdWithParticipatedProducts(
+            @ApiParam(value = "전시 ID") @PathVariable Long exhibitionId) {
+
+        ExhibitionWithParticipatedProducts result = productService.getByIdWithParticipatedProducts(
+                exhibitionId);
+        return ResponseExhibitionWithParticipatedProducts.from(result);
+    }
+
+    @ApiOperation(value = "전시 등록 - 신규 전시 등록", notes = "전시 정보 및 전시 포스터와 해당 전시에 포함된 작품들을 생성하는 API입니다.")
+    @ApiResponses({
+            @ApiResponse(code = 201, message = "생성 성공 - 신규 전시의 노출 여부는 `0`입니다."),
+    })
+    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    @ResponseStatus(HttpStatus.CREATED)
+    public void createExhibition(@Valid @RequestPart RequestCreateExhibition req,
+                                 @ApiParam(value = "포스터 이미지 파일") @RequestPart MultipartFile poster) {
+        productService.create(req, poster);
+    }
+}

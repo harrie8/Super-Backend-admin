@@ -58,13 +58,13 @@ public class ProductController {
         return productService.getProductsByCondition(condition);
     }
 
-    @ApiOperation(value = "전시 목록 - 선택 삭제", notes = "삭제하고 싶은 전시 번호들로 전시들을 삭제하는 API입니다.")
+    @ApiOperation(value = "작품 목록 - 선택 삭제", notes = "삭제하고 싶은 작품 코드들로 작품들을 삭제하는 API입니다.")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "전시 삭제 성공 - 삭제 성공한 전시의 개수를 반환합니다.", response = String.class),
+            @ApiResponse(code = 200, message = "작품 삭제 성공 - 삭제 성공한 작품의 개수를 반환합니다.", response = String.class),
     })
     @DeleteMapping
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<String> bulkDeleteByIds(@ApiParam(value = "삭제하고 싶은 전시 id들") @RequestParam Set<Long> ids) {
+    public ResponseEntity<String> bulkDeleteByIds(@ApiParam(value = "삭제하고 싶은 작품 id들") @RequestParam Set<Long> ids) {
         ResponseBulkDeleteByIds deleteCount = productService.bulkDeleteByIds(ids);
 
         return ResponseEntity.ok(deleteCount.toString());

@@ -10,7 +10,7 @@ public class ProductSearchCondition {
 
     private String title;
     private String artistName;
-    private Long productId;
+    private Long productId; // 작품 코드
 
     @Builder
     public ProductSearchCondition(String title, String artistName, Long productId) {

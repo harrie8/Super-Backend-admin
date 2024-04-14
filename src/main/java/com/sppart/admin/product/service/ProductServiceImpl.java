@@ -54,6 +54,7 @@ public class ProductServiceImpl implements ProductService {
         if (ids == null || ids.isEmpty()) {
             return ResponseBulkDeleteByIds.zero();
         }
+        productMapper.bulkDeleteProductWithTagByProductIds(ids);
         int productDeleteCount = productMapper.bulkDeleteByIds(ids);
         return ResponseBulkDeleteByIds.builder()
                 .exhibitionDeleteCount(productDeleteCount)

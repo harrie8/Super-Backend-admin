@@ -17,6 +17,8 @@ public interface ProductMapper {
 
     int countAll();
 
+    void bulkDeleteProductWithTagByProductIds(@Param("ids") Set<Long> ids);
+
     int bulkDeleteByIds(@Param("ids") Set<Long> ids);
 
     Optional<Product> findById(@Param("exhibitionId") Long exhibitionId);

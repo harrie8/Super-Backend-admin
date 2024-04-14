@@ -2,10 +2,13 @@ package com.sppart.admin.product.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.groups.Tuple.tuple;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.sppart.admin.objectstorage.service.ObjectStorageService;
 import com.sppart.admin.product.domain.mapper.ProductMapper;
 import com.sppart.admin.product.dto.ProductSearchCondition;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.assertj.core.groups.Tuple;
@@ -144,49 +147,43 @@ class ProductServiceImplTest {
                 );
     }
 
-//    @Test
-//    @DisplayName("전시 ID들로 전시들을 삭제하는 테스트")
-//    void bulkDeleteByIdsTest() {
-//        //given
-//        var ids = Set.of(1L, 2L);
-//        var beforeExhibitionCount = productMapper.countAll();
-//        var beforeProductExhibitionCount = productExhibitionMapper.countAll();
-//
-//        //when
-//        var actual = productService.bulkDeleteByIds(ids);
-//
-//        //then
-//        var afterExhibitionCount = productMapper.countAll();
-//        var afterProductExhibitionCount = productExhibitionMapper.countAll();
-//        assertAll(() -> {
-//            assertEquals(ids.size(), actual.getExhibitionDeleteCount());
-//            assertEquals(beforeExhibitionCount, afterExhibitionCount + ids.size());
-//            assertEquals(beforeProductExhibitionCount, afterProductExhibitionCount + 5);
-//        });
-//    }
-//
-//    @Test
-//    @DisplayName("전시 ID가 없다면 전시와 작품전시를 삭제하지 않는 테스트")
-//    void bulkDeleteByNoIdsTest() {
-//        //given
-//        var ids = new HashSet<Long>();
-//        var beforeExhibitionCount = productMapper.countAll();
-//        var beforeProductExhibitionCount = productExhibitionMapper.countAll();
-//
-//        //when
-//        var actual = productService.bulkDeleteByIds(ids);
-//
-//        //then
-//        var afterExhibitionCount = productMapper.countAll();
-//        var afterProductExhibitionCount = productExhibitionMapper.countAll();
-//        assertAll(() -> {
-//            assertEquals(ids.size(), actual.getProductExhibitionDeleteCount());
-//            assertEquals(ids.size(), actual.getExhibitionDeleteCount());
-//            assertEquals(beforeExhibitionCount, afterExhibitionCount);
-//            assertEquals(beforeProductExhibitionCount, afterProductExhibitionCount);
-//        });
-//    }
-//
+    @Test
+    @DisplayName("작품 코드들로 작품들을 삭제하는 테스트")
+    void bulkDeleteByIdsTest() {
+        //given
+        var ids = Set.of(1L, 2L);
+        var beforeProductCount = productMapper.countAll();
+
+        //when
+        var actual = productService.bulkDeleteByIds(ids);
+
+        //then
+        var afterProductCount = productMapper.countAll();
+        assertAll(() -> {
+            assertEquals(ids.size(), actual.getExhibitionDeleteCount());
+            assertEquals(beforeProductCount, afterProductCount + ids.size());
+        });
+    }
+
+    @Test
+    @DisplayName("작품 코드를 전달하지 않으면 작품을 삭제하지 않는 테스트")
+    void bulkDeleteByNoIdsTest() {
+        //given
+        var ids = new HashSet<Long>();
+        var beforeProductCount = productMapper.countAll();
+
+        //when
+        var actual = productService.bulkDeleteByIds(ids);
+
+        //then
+        var afterProductCount = productMapper.countAll();
+        assertAll(() -> {
+            assertEquals(ids.size(), actual.getProductExhibitionDeleteCount());
+            assertEquals(ids.size(), actual.getExhibitionDeleteCount());
+            assertEquals(beforeProductCount, afterProductCount);
+        });
+    }
+
 //    @Test
 //    @DisplayName("전시 ID로 전시 노출 상태 변경 테스트")
 //    void updateOnlyDisplayTest() {

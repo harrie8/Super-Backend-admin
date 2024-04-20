@@ -1,7 +1,7 @@
 package com.sppart.admin.product.domain.mapper;
 
-import com.sppart.admin.exhibition.dto.ExhibitionWithParticipatedProducts;
 import com.sppart.admin.product.domain.entity.Product;
+import com.sppart.admin.product.dto.DetailProductInfo;
 import com.sppart.admin.product.dto.ProductSearchCondition;
 import com.sppart.admin.product.dto.ProductWithTagsDto;
 import java.util.List;
@@ -21,10 +21,7 @@ public interface ProductMapper {
 
     int bulkDeleteByIds(@Param("ids") Set<Long> ids);
 
-    Optional<Product> findById(@Param("exhibitionId") Long exhibitionId);
-
-    Optional<ExhibitionWithParticipatedProducts> findByIdWithParticipatedProducts(
-            @Param("exhibitionId") Long exhibitionId);
+    Optional<DetailProductInfo> findDetailProductInfoById(@Param("productId") Long productId);
 
     void save(Product product);
 }

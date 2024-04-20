@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum ProductErrorCode implements ErrorCode {
 
-    NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 전시입니다."),
+    NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 작품입니다."),
     NOT_FOUND_STATUS(HttpStatus.NOT_FOUND, "존재하지 않는 전시 상태입니다."),
     ;
 

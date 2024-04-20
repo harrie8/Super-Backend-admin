@@ -4,7 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.groups.Tuple.tuple;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.sppart.admin.exception.SuperpositionAdminException;
 import com.sppart.admin.objectstorage.service.ObjectStorageService;
 import com.sppart.admin.product.domain.mapper.ProductMapper;
 import com.sppart.admin.product.dto.ProductSearchCondition;
@@ -184,119 +186,79 @@ class ProductServiceImplTest {
         });
     }
 
-//    @Test
-//    @DisplayName("전시 ID로 전시 노출 상태 변경 테스트")
-//    void updateOnlyDisplayTest() {
-//        //given
-//        var exhibitionId = 1L;
-//        var expected = 0;
-//        var req = RequestUpdateExhibitionDisplay.builder()
-//                .isDisplay(expected)
-//                .build();
-//
-//        //when
-//        productService.updateOnlyDisplay(exhibitionId, req);
-//
-//        //then
-//        var actual = productMapper.findById(exhibitionId).get().getIsDisplay();
-//        assertEquals(expected, actual);
-//    }
-//
-//    @Test
-//    @DisplayName("존재하지 않는 전시 ID로 전시 노출 상태 변경 테스트")
-//    void updateOnlyDisplayWithNotExistsExhibitionTest() {
-//        //given
-//        var exhibitionId = 100L;
-//        var req = RequestUpdateExhibitionDisplay.builder()
-//                .isDisplay(0)
-//                .build();
-//
-//        //expected
-//        assertThrows(SuperpositionAdminException.class, () -> productService.updateOnlyDisplay(exhibitionId, req));
-//    }
-//
-//    @Test
-//    @DisplayName("전시 상세 조회 시 전시 상세 정보와 해당 전시에 참여한 작품들 정보를 반환하는 테스트")
-//    void getByIdWithParticipatedProductsTest() {
-//        //given
-//        var exhibitionId = 1L;
-//        String[] productExtracting = {"title", "basicView", "qrView", "likeCount", "orderCount"};
-//
-//        //when
-//        var actual = productService.getByIdWithParticipatedProducts(exhibitionId);
-//
-//        //then
-//        assertAll(() -> {
-//            assertEquals(exhibitionId, actual.getExhibitionId());
-//            assertEquals("Christmas Tree and Neapolitan Baroque Crèche", actual.getTitle());
-//            assertThat(actual.getProducts())
-//                    .hasSize(4)
-//                    .extracting(productExtracting)
-//                    .containsExactlyInAnyOrder(
-//                            tuple(
-//                                    "roses",
-//                                    21,
-//                                    2,
-//                                    2,
-//                                    3),
-//                            tuple(
-//                                    "highway",
-//                                    10,
-//                                    5,
-//                                    3,
-//                                    1),
-//                            tuple(
-//                                    "christmas in my hand",
-//                                    6,
-//                                    3,
-//                                    1,
-//                                    0),
-//                            tuple(
-//                                    "You shine, protect the light",
-//                                    3,
-//                                    0,
-//                                    0,
-//                                    0)
-//                    );
-//        });
-//    }
-//
-//    @Test
-//    @DisplayName("전시에 참여한 작품들이 없는 전시 상세 조회 시 전시 상세 정보만 반환하는 테스트")
-//    void getByIdWithParticipatedProductsWithNotExistsParticipatedProductsTest() {
-//        //given
-//        var exhibitionId = 5L;
-//
-//        //when
-//        var actual = productService.getByIdWithParticipatedProducts(exhibitionId);
-//
-//        //then
-//        assertAll(() -> {
-//            assertEquals(exhibitionId, actual.getExhibitionId());
-//            assertEquals("Art for the Millions: American Culture and Politics in the 1930s", actual.getTitle());
-//            assertEquals("The 1930s was a decade of political and social upheaval in the United States,",
-//                    actual.getSubHeading());
-//            assertEquals("MET", actual.getLocation());
-//            assertEquals(LocalDate.parse("2023-09-07"), actual.getStartDate());
-//            assertEquals(LocalDate.parse("2023-12-10"), actual.getEndDate());
-//            assertEquals(ExhibitionStatus.end, actual.getStatus());
-//            assertEquals("1930s.jpg", actual.getPoster());
-//            assertThat(actual.getProducts())
-//                    .hasSize(0);
-//        });
-//    }
-//
-//    @Test
-//    @DisplayName("존재하지 않는 전시 ID로 전시 상세 조회 시 예외 발생하는 테스트")
-//    void getByIdWithParticipatedProductsWithNotExistsIdTest() {
-//        //given
-//        var notExistsExhibitionId = 100L;
-//
-//        //expected
-//        assertThrows(SuperpositionAdminException.class,
-//                () -> productService.getByIdWithParticipatedProducts(notExistsExhibitionId));
-//    }
-//
+    @Test
+    @DisplayName("작품 상세 조회 시 작품 상세 정보, 태그, 전시 상태, 작품이 참여중인 전시 이름을 반환하는 테스트")
+    void getDetailInfoByIdTest() {
+        //given
+        var productId = 1L;
+
+        //when
+        var actual = productService.getDetailInfoById(productId);
+
+        //then
+        assertAll(() -> {
+            assertEquals(1L, actual.getProductId());
+            assertEquals("6e305a70-0ed7-4f40-a59e-e28bb495887d.jpg", actual.getPicture());
+            assertEquals("roses", actual.getTitle());
+            assertEquals("문소", actual.getArtistName());
+            assertEquals("나를 위로해주는 아름다운 장미, 그리고 음악과 함께 떠오르는 아련한 기억", actual.getDescription());
+            assertEquals(250_000, actual.getPrice());
+            assertEquals(21, actual.getBasicView());
+            assertEquals(2, actual.getQrView());
+            assertEquals(2, actual.getLikeCount());
+            assertEquals(3, actual.getOrderCount());
+            assertThat(actual.getTags())
+                    .hasSize(3)
+                    .containsExactlyInAnyOrder(
+                            "청량한",
+                            "맑은",
+                            "아련한"
+                    );
+        });
+    }
+
+    @Test
+    @DisplayName("전시에 참여하지 않은 작품 상세 조회 시 작품 상세 정보만 반환하는 테스트")
+    void getDetailInfoByIdWithNotExistsParticipatedExhibitionsTest() {
+        //given
+        var productId = 5L;
+
+        //when
+        var actual = productService.getDetailInfoById(productId);
+
+        //then
+        assertAll(() -> {
+            assertEquals(5L, actual.getProductId());
+            assertEquals("72745895-04f3-4966-9263-932220f32e5f.jpg", actual.getPicture());
+            assertEquals("Home sweet home", actual.getTitle());
+            assertEquals("문소", actual.getArtistName());
+            assertEquals("오늘의 힐링, 이보다 더 좋을 수 없어.", actual.getDescription());
+            assertEquals(100_000, actual.getPrice());
+            assertEquals(7, actual.getBasicView());
+            assertEquals(4, actual.getQrView());
+            assertEquals(1, actual.getLikeCount());
+            assertEquals(1, actual.getOrderCount());
+            assertThat(actual.getTags())
+                    .hasSize(3)
+                    .containsExactlyInAnyOrder(
+                            "일상적인",
+                            "평온한",
+                            "컬러풀한"
+                    );
+        });
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 작품 ID로 작품 상세 조회 시 예외 발생하는 테스트")
+    void getDetailInfoByIdWithNotProductIdTest() {
+        //given
+        var notExistsProductId = 100L;
+
+        //expected
+        assertThrows(SuperpositionAdminException.class,
+                () -> productService.getDetailInfoById(notExistsProductId));
+    }
+
 //    @Test
 //    @DisplayName("전시 생성 테스트")
 //    void createTest() {

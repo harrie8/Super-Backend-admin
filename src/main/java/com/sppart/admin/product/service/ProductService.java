@@ -1,8 +1,8 @@
 package com.sppart.admin.product.service;
 
-import com.sppart.admin.exhibition.dto.ExhibitionWithParticipatedProducts;
 import com.sppart.admin.exhibition.dto.ResponseBulkDeleteByIds;
 import com.sppart.admin.exhibition.dto.request.RequestCreateExhibition;
+import com.sppart.admin.product.dto.DetailProductInfo;
 import com.sppart.admin.product.dto.ProductSearchCondition;
 import com.sppart.admin.product.dto.response.ResponseGetProductsWithTagsByCondition;
 import com.sppart.admin.product.dto.response.ResponseProductWithTags;
@@ -16,7 +16,7 @@ public interface ProductService {
 
     ResponseBulkDeleteByIds bulkDeleteByIds(Set<Long> ids);
 
-    ExhibitionWithParticipatedProducts getByIdWithParticipatedProducts(Long exhibitionId);
+    DetailProductInfo getDetailInfoById(Long productId);
 
     long create(RequestCreateExhibition req, MultipartFile poster);
 }

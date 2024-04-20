@@ -1,12 +1,12 @@
 package com.sppart.admin.product.controller;
 
-import com.sppart.admin.exhibition.dto.ExhibitionWithParticipatedProducts;
 import com.sppart.admin.exhibition.dto.ResponseBulkDeleteByIds;
 import com.sppart.admin.exhibition.dto.ResponseGetExhibitionsByCondition;
 import com.sppart.admin.exhibition.dto.request.RequestCreateExhibition;
-import com.sppart.admin.exhibition.dto.response.ResponseExhibitionWithParticipatedProducts;
+import com.sppart.admin.product.dto.DetailProductInfo;
 import com.sppart.admin.product.dto.ProductSearchCondition;
 import com.sppart.admin.product.dto.request.RequestGetProducts;
+import com.sppart.admin.product.dto.response.ResponseDetailProductInfo;
 import com.sppart.admin.product.dto.response.ResponseGetProductsWithTagsByCondition;
 import com.sppart.admin.product.dto.response.ResponseProductWithTags;
 import com.sppart.admin.product.service.ProductService;
@@ -70,19 +70,17 @@ public class ProductController {
         return ResponseEntity.ok(deleteCount.toString());
     }
 
-    @ApiOperation(value = "전시 상세 - 전시 상세 조회", notes = "전시 정보와 해당 전시에 포함된 작품들 정보도 조회하는 API입니다.")
+    @ApiOperation(value = "작품 상세 - 작품 상세 조회", notes = "작품의 상세 정보와 태그 등을 조회하는 API입니다. - 좋아요 내역은 작품의 좋아요 조회 API를 사용해주세요.")
     @ApiResponses({
             @ApiResponse(code = 200, message = "조회 성공", response = String.class),
-            @ApiResponse(code = 404, message = "존재하지 않는 전시", response = String.class),
+            @ApiResponse(code = 404, message = "존재하지 않는 작품", response = String.class),
     })
-    @GetMapping("/{exhibitionId}")
+    @GetMapping("/{productId}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseExhibitionWithParticipatedProducts getByIdWithParticipatedProducts(
-            @ApiParam(value = "전시 ID") @PathVariable Long exhibitionId) {
+    public ResponseDetailProductInfo getDetailProductInfoById(@ApiParam(value = "작품 ID") @PathVariable Long productId) {
 
-        ExhibitionWithParticipatedProducts result = productService.getByIdWithParticipatedProducts(
-                exhibitionId);
-        return ResponseExhibitionWithParticipatedProducts.from(result);
+        DetailProductInfo result = productService.getDetailInfoById(productId);
+        return ResponseDetailProductInfo.from(result);
     }
 
     @ApiOperation(value = "전시 등록 - 신규 전시 등록", notes = "전시 정보 및 전시 포스터와 해당 전시에 포함된 작품들을 생성하는 API입니다.")

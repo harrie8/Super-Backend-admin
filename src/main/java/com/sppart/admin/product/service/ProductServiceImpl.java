@@ -1,16 +1,16 @@
 package com.sppart.admin.product.service;
 
 import com.sppart.admin.exception.SuperpositionAdminException;
-import com.sppart.admin.exhibition.dto.ExhibitionWithParticipatedProducts;
 import com.sppart.admin.exhibition.dto.ResponseBulkDeleteByIds;
 import com.sppart.admin.exhibition.dto.request.RequestCreateExhibition;
-import com.sppart.admin.exhibition.exception.ExhibitionErrorCode;
 import com.sppart.admin.objectstorage.service.ObjectStorageService;
 import com.sppart.admin.product.domain.mapper.ProductMapper;
+import com.sppart.admin.product.dto.DetailProductInfo;
 import com.sppart.admin.product.dto.ProductSearchCondition;
 import com.sppart.admin.product.dto.ProductWithTagsDto;
 import com.sppart.admin.product.dto.response.ResponseGetProductsWithTagsByCondition;
 import com.sppart.admin.product.dto.response.ResponseProductWithTags;
+import com.sppart.admin.product.exception.ProductErrorCode;
 import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
@@ -63,11 +63,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional(readOnly = true)
-    public ExhibitionWithParticipatedProducts getByIdWithParticipatedProducts(Long exhibitionId) {
-        ExhibitionWithParticipatedProducts exhibitionWithParticipatedProducts = productMapper.findByIdWithParticipatedProducts(
-                exhibitionId).orElseThrow(() -> new SuperpositionAdminException(ExhibitionErrorCode.NOT_FOUND));
-        exhibitionWithParticipatedProducts.sortProductsByProductId();
-        return exhibitionWithParticipatedProducts;
+    public DetailProductInfo getDetailInfoById(Long productId) {
+        return productMapper.findDetailProductInfoById(productId)
+                .orElseThrow(() -> new SuperpositionAdminException(ProductErrorCode.NOT_FOUND));
     }
 
     @Override

@@ -32,7 +32,6 @@ public class ExhibitionServiceImpl implements ExhibitionService {
     private final ProductExhibitionMapper productExhibitionMapper;
     private final ObjectStorageService objectStorageService;
 
-    // todo 성능 체크 해보기 -> join vs domain 별로 db 접근
     @Override
     @Transactional(readOnly = true)
     public ResponseGetExhibitionsByCondition getExhibitionsByCondition(ExhibitionSearchCondition condition) {

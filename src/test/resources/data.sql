@@ -819,3 +819,7 @@ VALUES (1, 1),
        (1, 2),
        (1, 3),
        (13, 4);
+
+
+INSERT INTO picture_info (product_id, type, size, `year`)
+VALUES (1, '고급켄트지에 디지털프린팅', '83X59cm (A1)', 2023);

@@ -1,16 +1,13 @@
 package com.sppart.admin.product.dto;
 
+import com.sppart.admin.pictureinfo.domain.entity.PictureInfo;
 import java.util.Set;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 
-@Getter
+@Data
 @NoArgsConstructor
-@ToString
-@Setter
 public class DetailProductInfo {
 
     private Long productId;
@@ -23,6 +20,8 @@ public class DetailProductInfo {
     private Integer qrView;
     private Integer likeCount;
     private Integer orderCount;
+    private PictureInfo pictureInfo;
+    // todo 객체로 바꾸기
     private Set<String> tags;
     // todo 전시 관련 값 추가하기
 //    private Set<String> participatedExhibitionTitles;
@@ -30,7 +29,7 @@ public class DetailProductInfo {
     @Builder
     public DetailProductInfo(Long productId, String picture, String title, String artistName, String description,
                              Integer price, Integer basicView, Integer qrView, Integer likeCount, Integer orderCount,
-                             Set<String> tags) {
+                             PictureInfo pictureInfo, Set<String> tags) {
 
         this.productId = productId;
         this.picture = picture;
@@ -42,6 +41,7 @@ public class DetailProductInfo {
         this.qrView = qrView;
         this.likeCount = likeCount;
         this.orderCount = orderCount;
+        this.pictureInfo = pictureInfo;
         this.tags = tags;
     }
 }

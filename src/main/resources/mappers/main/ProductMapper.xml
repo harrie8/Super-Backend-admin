@@ -82,12 +82,20 @@
         <result column="qr_view" property="qrView"/>
         <result column="like_count" property="likeCount"/>
         <result column="order_count" property="orderCount"/>
+        <association property="pictureInfo" resultMap="pictureInfoMap"/>
         <collection property="tags" ofType="string">
             <result column="tagName"/>
         </collection>
     </resultMap>
 
-    <!--    todo picture_info join 하기-->
+    <resultMap id="pictureInfoMap" type="com.sppart.admin.pictureinfo.domain.entity.PictureInfo">
+        <id property="userId" column="userid"/>
+        <result property="product_id" column="product_id"/>
+        <result column="type" property="type"/>
+        <result column="size" property="size"/>
+        <result column="year" property="year"/>
+    </resultMap>
+
     <select id="findDetailProductInfoById" parameterType="Long" resultMap="detailProductInfoMap">
         SELECT prod.product_id,
                prod.picture,
@@ -99,10 +107,14 @@
                prod.qr_view,
                prod.like_count,
                prod.order_count,
+               pi.type,
+               pi.size,
+               pi.`year`,
                t.name AS tagName
         FROM product AS prod
                  LEFT JOIN product_with_tag AS pwt ON pwt.product_id = prod.product_id
                  LEFT JOIN tag AS t ON t.tag_id = pwt.tag_id
+                 INNER JOIN picture_info AS pi ON pi.product_id = prod.product_id
         WHERE prod.product_id = #{productId};
     </select>
 

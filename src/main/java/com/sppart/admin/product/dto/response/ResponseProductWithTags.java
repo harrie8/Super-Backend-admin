@@ -1,5 +1,6 @@
 package com.sppart.admin.product.dto.response;
 
+import com.sppart.admin.pictureinfo.dto.ResponsePictureInfo;
 import com.sppart.admin.product.dto.ProductWithTagsDto;
 import java.util.Set;
 import lombok.Builder;
@@ -16,17 +17,17 @@ public class ResponseProductWithTags {
     private String title;
     private String artistName;
     private Set<String> tags;
-    private String description;
+    private ResponsePictureInfo pictureInfo;
     private int price;
 
     @Builder
     public ResponseProductWithTags(long productId, String title, String artistName, Set<String> tags,
-                                   String description, int price) {
+                                   ResponsePictureInfo pictureInfo, int price) {
         this.productId = productId;
         this.title = title;
         this.artistName = artistName;
         this.tags = tags;
-        this.description = description;
+        this.pictureInfo = pictureInfo;
         this.price = price;
     }
 
@@ -36,7 +37,7 @@ public class ResponseProductWithTags {
                 .title(productWithTagsDto.getTitle())
                 .artistName(productWithTagsDto.getArtistName())
                 .tags(productWithTagsDto.getTags())
-                .description(productWithTagsDto.getDescription())
+                .pictureInfo(ResponsePictureInfo.from(productWithTagsDto.getPictureInfo()))
                 .price(productWithTagsDto.getPrice())
                 .build();
     }

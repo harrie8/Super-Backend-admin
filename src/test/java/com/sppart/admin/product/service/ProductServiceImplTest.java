@@ -69,7 +69,7 @@ class ProductServiceImplTest {
                 }, pictureInfoMapper, productWithTagMapper);
     }
 
-    private final String[] extracting = {"productId", "title", "artistName", "tags", "description", "price"};
+    private final String[] extracting = {"productId", "title", "artistName", "tags", "pictureInfo.type", "price"};
 
     @Test
     @DisplayName("모든 작품 조회 테스트")
@@ -394,7 +394,7 @@ class ProductServiceImplTest {
                 "roses",
                 "문소",
                 Set.of("청량한", "맑은", "아련한"),
-                "나를 위로해주는 아름다운 장미, 그리고 음악과 함께 떠오르는 아련한 기억",
+                "고급켄트지에 디지털프린팅",
                 250_000
         );
     }
@@ -405,7 +405,7 @@ class ProductServiceImplTest {
                 "highway",
                 "문소",
                 Set.of("청량한", "일상적인", "자유로운"),
-                "여행의 설레임과 즐거움 속에 언제나 함께하는 사랑스러운 너.",
+                "고급켄트지에 디지털프린팅",
                 350_000
         );
     }
@@ -416,7 +416,7 @@ class ProductServiceImplTest {
                 "우리들",
                 "문소",
                 Set.of("키치한", "일상적인"),
-                "맛있는 빵가게는 그냥 지나칠 수 없지!",
+                "고급켄트지에 디지털프린팅",
                 100000
         );
     }
@@ -427,7 +427,7 @@ class ProductServiceImplTest {
                 "How Deep Is Your Love?",
                 "문소",
                 Set.of("청량한", "컬러풀한", "평화로운"),
-                "당신의 사랑은 어느 정도 일까?",
+                "고급켄트지에 디지털프린팅",
                 100000
         );
     }
@@ -438,7 +438,7 @@ class ProductServiceImplTest {
                 "Home sweet home",
                 "문소",
                 Set.of("일상적인", "평온한", "컬러풀한"),
-                "오늘의 힐링, 이보다 더 좋을 수 없어.",
+                "고급켄트지에 디지털프린팅",
                 100000
         );
     }
@@ -449,7 +449,7 @@ class ProductServiceImplTest {
                 "fall",
                 "문소",
                 Set.of("따뜻한", "귀여운", "평온한"),
-                "바람이 불어오는 곳으로 걸어가다 보면 찾을 수 있겠지.",
+                "고급켄트지에 디지털프린팅",
                 250000
         );
     }
@@ -460,7 +460,7 @@ class ProductServiceImplTest {
                 "flower child",
                 "문소",
                 Set.of("평온한", "귀여운", "컬러풀한"),
-                "작고 예쁘고 소중한 아이",
+                "고급켄트지에 디지털프린팅",
                 200000
         );
     }
@@ -471,7 +471,7 @@ class ProductServiceImplTest {
                 "summer2 (rainy day)",
                 "문소",
                 Set.of("시원한", "상쾌한", "즐거운"),
-                "비가 내리던 휴양지에서",
+                "고급켄트지에 디지털프린팅",
                 100000
         );
     }
@@ -482,7 +482,7 @@ class ProductServiceImplTest {
                 "summer4 (icecream)",
                 "문소",
                 Set.of("달콤한", "컬러풀한", "일상적인"),
-                "어느 여름날",
+                "고급켄트지에 디지털프린팅",
                 200000
         );
     }
@@ -493,7 +493,7 @@ class ProductServiceImplTest {
                 "city light",
                 "문소",
                 Set.of("도시의", "빛나는", "자유로운"),
-                "댕댕이와 함께하는 신나는 드라이브",
+                "고급켄트지에 디지털프린팅",
                 200000
         );
     }
@@ -504,7 +504,7 @@ class ProductServiceImplTest {
                 "winter1 (with cat)",
                 "문소",
                 Set.of("귀여운", "잔망스러운"),
-                "첫 눈처럼 온 아이",
+                "고급켄트지에 디지털프린팅",
                 200000
         );
     }
@@ -515,7 +515,7 @@ class ProductServiceImplTest {
                 "winter2 (with dog)",
                 "문소",
                 Set.of("포근한", "아기자기한"),
-                "한겨울",
+                "고급켄트지에 디지털프린팅",
                 200000
         );
     }

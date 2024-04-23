@@ -2,15 +2,18 @@ package com.sppart.admin.product.service;
 
 import com.sppart.admin.exception.SuperpositionAdminException;
 import com.sppart.admin.exhibition.dto.ResponseBulkDeleteByIds;
-import com.sppart.admin.exhibition.dto.request.RequestCreateExhibition;
 import com.sppart.admin.objectstorage.service.ObjectStorageService;
+import com.sppart.admin.pictureinfo.domain.mapper.PictureInfoMapper;
+import com.sppart.admin.product.domain.entity.Product;
 import com.sppart.admin.product.domain.mapper.ProductMapper;
 import com.sppart.admin.product.dto.DetailProductInfo;
 import com.sppart.admin.product.dto.ProductSearchCondition;
 import com.sppart.admin.product.dto.ProductWithTagsDto;
+import com.sppart.admin.product.dto.request.RequestCreateProduct;
 import com.sppart.admin.product.dto.response.ResponseGetProductsWithTagsByCondition;
 import com.sppart.admin.product.dto.response.ResponseProductWithTags;
 import com.sppart.admin.product.exception.ProductErrorCode;
+import com.sppart.admin.productwithtag.domain.mapper.ProductWithTagMapper;
 import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +27,8 @@ public class ProductServiceImpl implements ProductService {
 
     private final ProductMapper productMapper;
     private final ObjectStorageService objectStorageService;
+    private final PictureInfoMapper pictureInfoMapper;
+    private final ProductWithTagMapper productWithTagMapper;
 
     @Override
     @Transactional(readOnly = true)
@@ -70,22 +75,18 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public long create(RequestCreateExhibition req, MultipartFile poster) {
-//        String url = objectStorageService.uploadFile(poster);
-//
-//        Exhibition exhibition = Exhibition.builder()
-//                .title(req.getTitle())
-//                .subHeading(req.getSubHeading())
-//                .location(req.getLocation())
-//                .startDate(req.getStartDate())
-//                .endDate(req.getEndDate())
-//                .status(ExhibitionStatus.findByName(req.getStatus()))
-//                .poster(url)
-//                .isDisplay(0)
-//                .build();
-//        productMapper.save(exhibition);
-//
-//        return exhibition.getId();
-        return 1L;
+    public long create(RequestCreateProduct req, MultipartFile picture) {
+        req.validateTags();
+        
+        String uuidFileName = objectStorageService.uploadFile(picture);
+
+        Product product = Product.create(uuidFileName, req);
+        productMapper.save(product);
+
+        Long productId = product.getProduct_id();
+        pictureInfoMapper.saveBy(productId, req.getPictureInfo());
+        productWithTagMapper.saveBy(productId, req.getTagIds());
+
+        return productId;
     }
 }

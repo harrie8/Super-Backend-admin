@@ -2,9 +2,9 @@ package com.sppart.admin.product.controller;
 
 import com.sppart.admin.exhibition.dto.ResponseBulkDeleteByIds;
 import com.sppart.admin.exhibition.dto.ResponseGetExhibitionsByCondition;
-import com.sppart.admin.exhibition.dto.request.RequestCreateExhibition;
 import com.sppart.admin.product.dto.DetailProductInfo;
 import com.sppart.admin.product.dto.ProductSearchCondition;
+import com.sppart.admin.product.dto.request.RequestCreateProduct;
 import com.sppart.admin.product.dto.request.RequestGetProducts;
 import com.sppart.admin.product.dto.response.ResponseDetailProductInfo;
 import com.sppart.admin.product.dto.response.ResponseGetProductsWithTagsByCondition;
@@ -83,14 +83,15 @@ public class ProductController {
         return ResponseDetailProductInfo.from(result);
     }
 
-    @ApiOperation(value = "전시 등록 - 신규 전시 등록", notes = "전시 정보 및 전시 포스터와 해당 전시에 포함된 작품들을 생성하는 API입니다.")
+    @ApiOperation(value = "작품 등록 - 신규 작품 등록", notes = "작품 정보 및 작품 이미지를 생성하는 API입니다.")
     @ApiResponses({
             @ApiResponse(code = 201, message = "생성 성공 - 신규 전시의 노출 여부는 `0`입니다."),
     })
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     @ResponseStatus(HttpStatus.CREATED)
-    public void createExhibition(@Valid @RequestPart RequestCreateExhibition req,
-                                 @ApiParam(value = "포스터 이미지 파일") @RequestPart MultipartFile poster) {
-        productService.create(req, poster);
+    public void createProduct(@Valid @RequestPart RequestCreateProduct req,
+                              @ApiParam(value = "작품 이미지 파일") @RequestPart MultipartFile picture) {
+
+        productService.create(req, picture);
     }
 }

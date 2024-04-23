@@ -87,6 +87,7 @@
         </collection>
     </resultMap>
 
+    <!--    todo picture_info join 하기-->
     <select id="findDetailProductInfoById" parameterType="Long" resultMap="detailProductInfoMap">
         SELECT prod.product_id,
                prod.picture,
@@ -105,9 +106,11 @@
         WHERE prod.product_id = #{productId};
     </select>
 
-    <insert id="save" parameterType="com.sppart.admin.exhibition.domain.entity.Exhibition" useGeneratedKeys="true"
-            keyProperty="id">
-        INSERT INTO exhibition(title, subHeading, start_date, end_date, location, status, poster, is_display)
-        VALUES (#{title}, #{subHeading}, #{startDate}, #{endDate}, #{location}, #{status}, #{poster}, #{isDisplay});
+    <insert id="save" parameterType="com.sppart.admin.product.domain.entity.Product" useGeneratedKeys="true"
+            keyProperty="product_id">
+        INSERT INTO product(picture, title, artist_name, description, price, basic_view, qr_view, like_count,
+                            order_count)
+        VALUES (#{picture}, #{title}, #{artistName}, #{description}, #{price}, #{basicView}, #{qrView}, #{likeCount},
+                #{orderCount});
     </insert>
 </mapper>

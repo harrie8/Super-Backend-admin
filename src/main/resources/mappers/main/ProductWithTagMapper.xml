@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sppart.admin.productwithtag.domain.mapper.ProductWithTagMapper">
+
+    <insert id="saveBy">
+        <if test="productId != null and tagIds != null and !tagIds.isEmpty()">
+            INSERT INTO product_with_tag(product_id, tag_id)
+            VALUES
+            <foreach collection="tagIds" item="tagId" open="(" close=")" separator="), (">
+                #{productId}, #{tagId}
+            </foreach>
+        </if>
+    </insert>
+</mapper>

@@ -1,9 +1,9 @@
 package com.sppart.admin.product.service;
 
 import com.sppart.admin.exhibition.dto.ResponseBulkDeleteByIds;
-import com.sppart.admin.exhibition.dto.request.RequestCreateExhibition;
 import com.sppart.admin.product.dto.DetailProductInfo;
 import com.sppart.admin.product.dto.ProductSearchCondition;
+import com.sppart.admin.product.dto.request.RequestCreateProduct;
 import com.sppart.admin.product.dto.response.ResponseGetProductsWithTagsByCondition;
 import com.sppart.admin.product.dto.response.ResponseProductWithTags;
 import java.util.Set;
@@ -18,5 +18,5 @@ public interface ProductService {
 
     DetailProductInfo getDetailInfoById(Long productId);
 
-    long create(RequestCreateExhibition req, MultipartFile poster);
+    long create(RequestCreateProduct req, MultipartFile picture);
 }

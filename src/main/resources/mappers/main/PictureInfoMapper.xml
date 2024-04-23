@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sppart.admin.pictureinfo.domain.mapper.PictureInfoMapper">
+
+    <insert id="saveBy">
+        INSERT INTO picture_info(product_id, type, size, `year`)
+        VALUES (#{productId}, #{req.type}, #{req.size}, #{req.year});
+    </insert>
+</mapper>

@@ -2,14 +2,21 @@ package com.sppart.admin.product.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.groups.Tuple.tuple;
+import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.sppart.admin.exception.SuperpositionAdminException;
 import com.sppart.admin.objectstorage.service.ObjectStorageService;
+import com.sppart.admin.pictureinfo.domain.mapper.PictureInfoMapper;
+import com.sppart.admin.pictureinfo.dto.RequestCreatePictureInfo;
 import com.sppart.admin.product.domain.mapper.ProductMapper;
 import com.sppart.admin.product.dto.ProductSearchCondition;
+import com.sppart.admin.product.dto.request.RequestCreateProduct;
+import com.sppart.admin.productwithtag.domain.mapper.ProductWithTagMapper;
+import com.sppart.admin.productwithtag.dto.RequestCreateTag;
+import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -17,6 +24,7 @@ import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestConstructor;
 import org.springframework.test.context.TestConstructor.AutowireMode;
@@ -29,9 +37,14 @@ class ProductServiceImplTest {
 
     private final ProductService productService;
     private final ProductMapper productMapper;
+    private final PictureInfoMapper pictureInfoMapper;
+    private final ProductWithTagMapper productWithTagMapper;
 
-    public ProductServiceImplTest(ProductMapper productMapper) {
+    public ProductServiceImplTest(ProductMapper productMapper, PictureInfoMapper pictureInfoMapper,
+                                  ProductWithTagMapper productWithTagMapper) {
         this.productMapper = productMapper;
+        this.pictureInfoMapper = pictureInfoMapper;
+        this.productWithTagMapper = productWithTagMapper;
         this.productService = new ProductServiceImpl(productMapper,
                 new ObjectStorageService() {
                     @Override
@@ -53,7 +66,7 @@ class ProductServiceImplTest {
                     public void delete(List<String> urls) {
 
                     }
-                });
+                }, pictureInfoMapper, productWithTagMapper);
     }
 
     private final String[] extracting = {"productId", "title", "artistName", "tags", "description", "price"};
@@ -259,46 +272,116 @@ class ProductServiceImplTest {
                 () -> productService.getDetailInfoById(notExistsProductId));
     }
 
-//    @Test
-//    @DisplayName("전시 생성 테스트")
-//    void createTest() {
-//        //given
-//        var req = RequestCreateExhibition.builder()
-//                .title("제목입니다.")
-//                .subHeading("부제목입니다.")
-//                .startDate(LocalDate.parse("2024-01-01"))
-//                .endDate(LocalDate.parse("2024-05-01"))
-//                .location("장소입니다.")
-//                .status(ExhibitionStatus.current.name())
-//                .productIds(Set.of(1L, 2L, 3L))
-//                .build();
-//        var poster = new MockMultipartFile("file", "test.txt", "text/plain",
-//                "test file".getBytes(StandardCharsets.UTF_8));
-//
-//        //when
-//        var createdExhibitionId = productService.create(req, poster);
-//
-//        //then
-//        var actual = productMapper.findById(createdExhibitionId).get();
-//        var productExhibitions = productExhibitionMapper.findByExhibitionId(createdExhibitionId);
-//        assertAll(() -> {
-//            assertEquals(req.getTitle(), actual.getTitle());
-//            assertEquals(req.getSubHeading(), actual.getSubHeading());
-//            assertEquals(req.getLocation(), actual.getLocation());
-//            assertEquals(req.getStartDate(), actual.getStartDate());
-//            assertEquals(req.getEndDate(), actual.getEndDate());
-//            assertEquals(ExhibitionStatus.findByName(req.getStatus()), actual.getStatus());
-//            assertNotNull(actual.getPoster());
-//            assertThat(productExhibitions)
-//                    .hasSize(3)
-//                    .extracting("productId", "exhibitionId")
-//                    .containsExactlyInAnyOrder(
-//                            tuple(1L, createdExhibitionId),
-//                            tuple(2L, createdExhibitionId),
-//                            tuple(3L, createdExhibitionId)
-//                    );
-//        });
-//    }
+    @Test
+    @DisplayName("작품 생성 테스트")
+    void createTest() {
+        //given
+        var requestCreatePictureInfo = RequestCreatePictureInfo.builder()
+                .type("고급켄트지에 디지털프린팅")
+                .size("83X59cm (A1)")
+                .year(2023)
+                .build();
+        var tags = Set.of(RequestCreateTag.builder()
+                        .tagId(1L)
+                        .value("청량한")
+                        .build(),
+                RequestCreateTag.builder()
+                        .tagId(15L)
+                        .value("맑은")
+                        .build(),
+                RequestCreateTag.builder()
+                        .tagId(27L)
+                        .value("아련한")
+                        .build());
+        var req = RequestCreateProduct.builder()
+                .title("roses")
+                .artistName("문소")
+                .description("나를 위로해주는 아름다운 장미, 그리고 음악과 함께 떠오르는 아련한 기억")
+                .pictureInfo(requestCreatePictureInfo)
+                .tags(tags)
+                .price(250_000)
+                .build();
+        var picture = new MockMultipartFile("file", "test.txt", "text/plain",
+                "test file".getBytes(StandardCharsets.UTF_8));
+
+        //when
+        var createdProductId = productService.create(req, picture);
+
+        //then
+        var actual = productMapper.findDetailProductInfoById(createdProductId).get();
+        assertAll(() -> {
+            assertNotNull(actual.getPicture());
+            assertEquals(req.getTitle(), actual.getTitle());
+            assertEquals(req.getArtistName(), actual.getArtistName());
+            assertEquals(req.getDescription(), actual.getDescription());
+            assertEquals(0, actual.getBasicView());
+            assertEquals(0, actual.getQrView());
+            assertEquals(0, actual.getLikeCount());
+            assertEquals(0, actual.getOrderCount());
+//            assertEquals(req.getPictureInfo().getSize(), actual.getPictureInfo());
+            assertEquals(Set.of("청량한", "맑은", "아련한"), actual.getTags());
+        });
+    }
+
+    @Test
+    @DisplayName("작품 생성 예외 테스트")
+    void createWithNotValidParameterTest() {
+        //given
+        var requestCreatePictureInfo = RequestCreatePictureInfo.builder()
+                .type("고급켄트지에 디지털프린팅")
+                .size("83X59cm (A1)")
+                .year(2023)
+                .build();
+        var tags = Set.of(RequestCreateTag.builder()
+                        .tagId(1L)
+                        .value("청량한")
+                        .build(),
+                RequestCreateTag.builder()
+                        .tagId(19L)
+                        .value("아기자기한")
+                        .build(),
+                RequestCreateTag.builder()
+                        .tagId(21L)
+                        .value("잔망스러운")
+                        .build());
+        var req = RequestCreateProduct.builder()
+                .title("roses")
+                .artistName("문소")
+                .description("나를 위로해주는 아름다운 장미, 그리고 음악과 함께 떠오르는 아련한 기억")
+                .pictureInfo(requestCreatePictureInfo)
+                .tags(tags)
+                .price(250_000)
+                .build();
+        var picture = new MockMultipartFile("file", "test.txt", "text/plain",
+                "test file".getBytes(StandardCharsets.UTF_8));
+
+        //expected
+        assertThrows(SuperpositionAdminException.class, () -> productService.create(req, picture));
+    }
+
+    @Test
+    @DisplayName("작품 생성 예외 테스트2")
+    void createWithNotValidParameter2Test() {
+        //given
+        var requestCreatePictureInfo = RequestCreatePictureInfo.builder()
+                .type("고급켄트지에 디지털프린팅")
+                .size("83X59cm (A1)")
+                .year(2023)
+                .build();
+        var req = RequestCreateProduct.builder()
+                .title("roses")
+                .artistName("문소")
+                .description("나를 위로해주는 아름다운 장미, 그리고 음악과 함께 떠오르는 아련한 기억")
+                .pictureInfo(requestCreatePictureInfo)
+                .tags(Set.of())
+                .price(250_000)
+                .build();
+        var picture = new MockMultipartFile("file", "test.txt", "text/plain",
+                "test file".getBytes(StandardCharsets.UTF_8));
+
+        //expected
+        assertThrows(SuperpositionAdminException.class, () -> productService.create(req, picture));
+    }
 
     private Tuple id1Product() {
         return tuple(

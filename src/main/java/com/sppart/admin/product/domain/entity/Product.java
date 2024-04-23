@@ -1,12 +1,13 @@
 package com.sppart.admin.product.domain.entity;
 
+import com.sppart.admin.product.dto.request.RequestCreateProduct;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 
-@Getter
+@Data
 public class Product {
 
-    private final Long productId;
+    private final Long product_id;
     private final String picture;
     private final String title;
     private final String artistName;
@@ -18,9 +19,9 @@ public class Product {
     private final int orderCount;
 
     @Builder
-    public Product(Long productId, String picture, String title, String artistName, String description, int price,
+    public Product(Long product_id, String picture, String title, String artistName, String description, int price,
                    int basicView, int qrView, int likeCount, int orderCount) {
-        this.productId = productId;
+        this.product_id = product_id;
         this.picture = picture;
         this.title = title;
         this.artistName = artistName;
@@ -30,5 +31,19 @@ public class Product {
         this.qrView = qrView;
         this.likeCount = likeCount;
         this.orderCount = orderCount;
+    }
+
+    public static Product create(String picture, RequestCreateProduct req) {
+        return Product.builder()
+                .picture(picture)
+                .title(req.getTitle())
+                .artistName(req.getArtistName())
+                .description(req.getDescription())
+                .price(req.getPrice())
+                .basicView(0)
+                .qrView(0)
+                .likeCount(0)
+                .orderCount(0)
+                .build();
     }
 }

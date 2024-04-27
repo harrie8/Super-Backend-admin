@@ -11,4 +11,6 @@ public interface PictureInfoMapper {
     void saveBy(@Param("productId") Long productId, @Param("req") RequestCreatePictureInfo req);
 
     int bulkDeleteByProductIds(@Param("productIds") Set<Long> productIds);
+
+    void deleteByProductId(@Param("productId") Long productId);
 }

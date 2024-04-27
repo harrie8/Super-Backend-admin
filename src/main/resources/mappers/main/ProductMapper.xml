@@ -149,4 +149,18 @@
         VALUES (#{picture}, #{title}, #{artistName}, #{description}, #{price}, #{basicView}, #{qrView}, #{likeCount},
                 #{orderCount});
     </insert>
+
+    <update id="update">
+        UPDATE product
+        SET picture     = #{picture},
+            title       = #{req.title},
+            artist_name = #{req.artistName},
+            description = #{req.description},
+            price       = #{req.price},
+            basic_view  = #{req.basicView},
+            qr_view     = #{req.qrView},
+            like_count  = #{req.likeCount},
+            order_count = #{req.orderCount}
+        WHERE product_id = #{productId};
+    </update>
 </mapper>

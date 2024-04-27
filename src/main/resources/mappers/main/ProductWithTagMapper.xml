@@ -24,4 +24,10 @@
             </foreach>
         </if>
     </insert>
+
+    <delete id="deleteByProductId" parameterType="Long">
+        DELETE
+        FROM product_with_tag AS pwi
+        WHERE pwi.product_id = #{productId};
+    </delete>
 </mapper>

@@ -15,6 +15,7 @@ import com.sppart.admin.pictureinfo.dto.RequestCreatePictureInfo;
 import com.sppart.admin.product.domain.mapper.ProductMapper;
 import com.sppart.admin.product.dto.ProductSearchCondition;
 import com.sppart.admin.product.dto.request.RequestCreateProduct;
+import com.sppart.admin.product.dto.request.RequestUpdateProduct;
 import com.sppart.admin.productexhibition.mapper.ProductExhibitionMapper;
 import com.sppart.admin.productwithtag.domain.mapper.ProductWithTagMapper;
 import com.sppart.admin.tag.domain.entity.Tag;
@@ -53,7 +54,7 @@ class ProductServiceImplTest {
                 new ObjectStorageService() {
                     @Override
                     public String uploadFile(MultipartFile file) {
-                        return "";
+                        return file.getName();
                     }
 
                     @Override
@@ -431,6 +432,158 @@ class ProductServiceImplTest {
 
         //expected
         assertThrows(SuperpositionAdminException.class, () -> productService.create(req, picture));
+    }
+
+    @Test
+    @DisplayName("작품 수정 테스트")
+    void updateTest() {
+        //given
+        var requestCreatePictureInfo = RequestCreatePictureInfo.builder()
+                .type("고급켄트지에 디지털프린팅")
+                .size("83X59cm (A1)")
+                .year(2023)
+                .build();
+        var tagIds = Set.of(1L, 15L, 27L);
+        var req = RequestCreateProduct.builder()
+                .title("roses2")
+                .artistName("문소2")
+                .description("나를 위로해주는 아름다운 장미, 그리고 음악과 함께 떠오르는 아련한 기억2")
+                .pictureInfo(requestCreatePictureInfo)
+                .tagIds(tagIds)
+                .price(250_000)
+                .build();
+        var picture = new MockMultipartFile("file", "test.txt", "text/plain",
+                "test file".getBytes(StandardCharsets.UTF_8));
+        var createdProductId = productService.create(req, picture);
+
+        var requestUpdatePictureInfo = RequestCreatePictureInfo.builder()
+                .type("고급켄트지에 디지털프린팅-edit")
+                .size("83X59cm (A1)-edit")
+                .year(2024)
+                .build();
+        var editTagIds = Set.of(2L, 3L, 4L);
+        var updateReq = RequestUpdateProduct.builder()
+                .title("editTitle")
+                .oldPicture(picture.getName())
+                .artistName("editArtistName")
+                .description("editDescription")
+                .pictureInfo(requestUpdatePictureInfo)
+                .tagIds(editTagIds)
+                .price(1_000)
+                .basicView(0)
+                .qrView(0)
+                .likeCount(0)
+                .orderCount(0)
+                .build();
+        var updatePicture = new MockMultipartFile("edit_file", "test.txt", "text/plain",
+                "test file".getBytes(StandardCharsets.UTF_8));
+
+        //when
+        productService.update(createdProductId, updateReq, updatePicture);
+
+        //then
+        var actual = productMapper.findDetailProductInfoById(createdProductId).get();
+        assertAll(() -> {
+            assertEquals(updatePicture.getName(), actual.getPicture());
+            assertEquals(updateReq.getTitle(), actual.getTitle());
+            assertEquals(updateReq.getArtistName(), actual.getArtistName());
+            assertEquals(updateReq.getDescription(), actual.getDescription());
+            assertEquals(updateReq.getBasicView(), actual.getBasicView());
+            assertEquals(updateReq.getQrView(), actual.getQrView());
+            assertEquals(updateReq.getLikeCount(), actual.getLikeCount());
+            assertEquals(updateReq.getOrderCount(), actual.getOrderCount());
+            assertEquals(updateReq.getPictureInfo().getType(), actual.getPictureInfo().getType());
+            assertEquals(updateReq.getPictureInfo().getSize(), actual.getPictureInfo().getSize());
+            assertEquals(updateReq.getPictureInfo().getYear(), actual.getPictureInfo().getYear());
+            assertEquals(Set.of(
+                    Tag.builder()
+                            .tag_id(2L)
+                            .name("일상적인")
+                            .build(),
+                    Tag.builder()
+                            .tag_id(3L)
+                            .name("따뜻한")
+                            .build(),
+                    Tag.builder()
+                            .tag_id(4L)
+                            .name("평온한")
+                            .build()), actual.getTags());
+        });
+    }
+
+    @Test
+    @DisplayName("작품 수정 시 이미지를 첨부하지 않으면 기존 이미지를 그대로 사용하는 테스트")
+    void updateWithOldPictureTest() {
+        //given
+        var requestCreatePictureInfo = RequestCreatePictureInfo.builder()
+                .type("고급켄트지에 디지털프린팅")
+                .size("83X59cm (A1)")
+                .year(2023)
+                .build();
+        var tagIds = Set.of(1L, 15L, 27L);
+        var req = RequestCreateProduct.builder()
+                .title("roses2")
+                .artistName("문소2")
+                .description("나를 위로해주는 아름다운 장미, 그리고 음악과 함께 떠오르는 아련한 기억2")
+                .pictureInfo(requestCreatePictureInfo)
+                .tagIds(tagIds)
+                .price(250_000)
+                .build();
+        var picture = new MockMultipartFile("file", "test.txt", "text/plain",
+                "test file".getBytes(StandardCharsets.UTF_8));
+        var createdProductId = productService.create(req, picture);
+
+        var requestUpdatePictureInfo = RequestCreatePictureInfo.builder()
+                .type("고급켄트지에 디지털프린팅-edit")
+                .size("83X59cm (A1)-edit")
+                .year(2024)
+                .build();
+        var editTagIds = Set.of(2L, 3L, 4L);
+        var updateReq = RequestUpdateProduct.builder()
+                .title("editTitle")
+                .oldPicture(picture.getName())
+                .artistName("editArtistName")
+                .description("editDescription")
+                .pictureInfo(requestUpdatePictureInfo)
+                .tagIds(editTagIds)
+                .price(1_000)
+                .basicView(0)
+                .qrView(0)
+                .likeCount(0)
+                .orderCount(0)
+                .build();
+
+        //when
+        productService.update(createdProductId, updateReq, null);
+
+        //then
+        var actual = productMapper.findDetailProductInfoById(createdProductId).get();
+        assertAll(() -> {
+            assertEquals(picture.getName(), actual.getPicture());
+            assertEquals(updateReq.getTitle(), actual.getTitle());
+            assertEquals(updateReq.getArtistName(), actual.getArtistName());
+            assertEquals(updateReq.getDescription(), actual.getDescription());
+            assertEquals(updateReq.getBasicView(), actual.getBasicView());
+            assertEquals(updateReq.getQrView(), actual.getQrView());
+            assertEquals(updateReq.getLikeCount(), actual.getLikeCount());
+            assertEquals(updateReq.getOrderCount(), actual.getOrderCount());
+            assertEquals(updateReq.getPictureInfo().getType(), actual.getPictureInfo().getType());
+            assertEquals(updateReq.getPictureInfo().getSize(), actual.getPictureInfo().getSize());
+            assertEquals(updateReq.getPictureInfo().getYear(), actual.getPictureInfo().getYear());
+            assertEquals(Set.of(
+                    Tag.builder()
+                            .tag_id(2L)
+                            .name("일상적인")
+                            .build(),
+                    Tag.builder()
+                            .tag_id(3L)
+                            .name("따뜻한")
+                            .build(),
+                    Tag.builder()
+                            .tag_id(4L)
+                            .name("평온한")
+                            .build()), actual.getTags());
+        });
     }
 
     private Tuple id1Product() {

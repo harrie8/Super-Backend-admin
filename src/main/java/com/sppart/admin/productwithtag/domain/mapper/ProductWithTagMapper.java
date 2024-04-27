@@ -10,4 +10,6 @@ public interface ProductWithTagMapper {
     int bulkDeleteByProductIds(@Param("ids") Set<Long> ids);
 
     void saveBy(@Param("productId") Long productId, @Param("tagIds") Set<Long> tagIds);
+
+    void deleteByProductId(@Param("productId") Long productId);
 }

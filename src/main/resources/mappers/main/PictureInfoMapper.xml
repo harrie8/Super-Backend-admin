@@ -19,4 +19,10 @@
             </where>
         </if>
     </delete>
+
+    <delete id="deleteByProductId" parameterType="Long">
+        DELETE
+        FROM picture_info AS pi
+        WHERE pi.product_id = #{productId};
+    </delete>
 </mapper>

@@ -3,6 +3,7 @@ package com.sppart.admin.product.domain.mapper;
 import com.sppart.admin.product.domain.entity.Product;
 import com.sppart.admin.product.dto.DetailProductInfo;
 import com.sppart.admin.product.dto.ProductSearchCondition;
+import com.sppart.admin.product.dto.request.RequestUpdateProduct;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -23,4 +24,7 @@ public interface ProductMapper {
     void save(Product product);
 
     List<DetailProductInfo> findDetailProductInfoByIds(@Param("productIds") Set<Long> productIds);
+
+    void update(@Param("productId") Long productId, @Param("picture") String picture,
+                @Param("req") RequestUpdateProduct req);
 }

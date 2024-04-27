@@ -4,6 +4,7 @@ import com.sppart.admin.exhibition.dto.ResponseGetExhibitionsByCondition;
 import com.sppart.admin.product.dto.ProductSearchCondition;
 import com.sppart.admin.product.dto.request.RequestCreateProduct;
 import com.sppart.admin.product.dto.request.RequestGetProducts;
+import com.sppart.admin.product.dto.request.RequestUpdateProduct;
 import com.sppart.admin.product.dto.response.ResponseBulkDeleteProductByIds;
 import com.sppart.admin.product.dto.response.ResponseDetailProductInfo;
 import com.sppart.admin.product.dto.response.ResponseGetProductsByCondition;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -91,5 +93,19 @@ public class ProductController {
                               @ApiParam(value = "작품 이미지 파일") @RequestPart MultipartFile picture) {
 
         productService.create(req, picture);
+    }
+
+    @ApiOperation(value = "작품 수정", notes = "작품의 정보룰 수정하는 API입니다.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "작품 수정 성공", response = String.class)
+    })
+    @PutMapping("/{productId}")
+    @ResponseStatus(HttpStatus.OK)
+    public String updateProduct(@ApiParam(value = "작품 ID") @PathVariable Long productId,
+                                @Valid @RequestPart RequestUpdateProduct req,
+                                @ApiParam(value = "작품 이미지 파일") @RequestPart(required = false) MultipartFile picture) {
+        productService.update(productId, req, picture);
+
+        return "product update success";
     }
 }

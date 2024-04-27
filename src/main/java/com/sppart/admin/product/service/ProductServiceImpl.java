@@ -11,6 +11,7 @@ import com.sppart.admin.product.domain.mapper.ProductMapper;
 import com.sppart.admin.product.dto.DetailProductInfo;
 import com.sppart.admin.product.dto.ProductSearchCondition;
 import com.sppart.admin.product.dto.request.RequestCreateProduct;
+import com.sppart.admin.product.dto.request.RequestUpdateProduct;
 import com.sppart.admin.product.dto.response.ResponseBulkDeleteProductByIds;
 import com.sppart.admin.product.dto.response.ResponseDetailProductInfo;
 import com.sppart.admin.product.dto.response.ResponseGetProductsByCondition;
@@ -128,5 +129,27 @@ public class ProductServiceImpl implements ProductService {
         productWithTagMapper.saveBy(productId, tags.getIds());
 
         return productId;
+    }
+
+    @Override
+    @Transactional
+    public void update(Long productId, RequestUpdateProduct req, MultipartFile picture) {
+        req.validateTags();
+
+        String uuidFileName = req.getOldPicture();
+        if (picture != null && !picture.isEmpty()) {
+            objectStorageService.delete(req.getOldPicture());
+            uuidFileName = objectStorageService.uploadFile(picture);
+        }
+
+        productMapper.update(productId, uuidFileName, req);
+
+        pictureInfoMapper.deleteByProductId(productId);
+        pictureInfoMapper.saveBy(productId, req.getPictureInfo());
+
+        productWithTagMapper.deleteByProductId(productId);
+        Tags tags = new Tags(tagMapper.findByIds(req.getTagIds()));
+        // todo cache 적용해보기, name에 unique 걸어서 동시 생성할 때 오류 나오게 수정해보기
+        productWithTagMapper.saveBy(productId, tags.getIds());
     }
 }

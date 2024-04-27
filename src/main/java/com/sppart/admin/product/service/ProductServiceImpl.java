@@ -14,6 +14,8 @@ import com.sppart.admin.product.dto.response.ResponseGetProductsWithTagsByCondit
 import com.sppart.admin.product.dto.response.ResponseProductWithTags;
 import com.sppart.admin.product.exception.ProductErrorCode;
 import com.sppart.admin.productwithtag.domain.mapper.ProductWithTagMapper;
+import com.sppart.admin.tag.domain.entity.Tags;
+import com.sppart.admin.tag.domain.mapper.TagMapper;
 import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +31,7 @@ public class ProductServiceImpl implements ProductService {
     private final ObjectStorageService objectStorageService;
     private final PictureInfoMapper pictureInfoMapper;
     private final ProductWithTagMapper productWithTagMapper;
+    private final TagMapper tagMapper;
 
     @Override
     @Transactional(readOnly = true)
@@ -77,7 +80,7 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     public long create(RequestCreateProduct req, MultipartFile picture) {
         req.validateTags();
-        
+
         String uuidFileName = objectStorageService.uploadFile(picture);
 
         Product product = Product.create(uuidFileName, req);
@@ -85,7 +88,10 @@ public class ProductServiceImpl implements ProductService {
 
         Long productId = product.getProduct_id();
         pictureInfoMapper.saveBy(productId, req.getPictureInfo());
-        productWithTagMapper.saveBy(productId, req.getTagIds());
+
+        // todo cache 적용해보기
+        Tags tags = new Tags(tagMapper.findByIds(req.getTagIds()));
+        productWithTagMapper.saveBy(productId, tags.getIds());
 
         return productId;
     }

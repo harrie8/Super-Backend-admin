@@ -1,12 +1,10 @@
 package com.sppart.admin.product.dto.request;
 
-import com.sppart.admin.exception.CommonErrorCode;
 import com.sppart.admin.exception.SuperpositionAdminException;
 import com.sppart.admin.pictureinfo.dto.RequestCreatePictureInfo;
-import com.sppart.admin.productwithtag.dto.RequestCreateTag;
+import com.sppart.admin.productwithtag.exception.ProductWithTagErrorCode;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Set;
-import java.util.stream.Collectors;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -32,38 +30,30 @@ public class RequestCreateProduct {
     private RequestCreatePictureInfo pictureInfo;
     @Schema(description = "작품 태그들 - 필수", type = "java.util.Set", required = true)
     @NotNull
-    private Set<RequestCreateTag> tags;
+    private Set<Long> tagIds;
     @Schema(description = "가격 - 필수", example = "250000", required = true)
     @NotNull
     private int price;
 
     @Builder
     public RequestCreateProduct(String title, String artistName, String description,
-                                RequestCreatePictureInfo pictureInfo, Set<RequestCreateTag> tags, int price) {
+                                RequestCreatePictureInfo pictureInfo, Set<Long> tagIds, int price) {
         this.title = title;
         this.artistName = artistName;
         this.description = description;
         this.pictureInfo = pictureInfo;
-        this.tags = tags;
+        this.tagIds = tagIds;
         this.price = price;
     }
 
     public void validateTags() {
-        if (tags.isEmpty()) {
-            throw new SuperpositionAdminException(CommonErrorCode.INVALID_PARAMETER);
+        if (tagIds.isEmpty()) {
+            throw new SuperpositionAdminException(ProductWithTagErrorCode.EMPTY_TAGS);
         }
-        Integer tagLengthSum = tags.stream()
-                .map(RequestCreateTag::getValue)
-                .map(String::length)
-                .reduce(0, Integer::sum);
-        if (tagLengthSum > 11) {
-            throw new SuperpositionAdminException(CommonErrorCode.INVALID_PARAMETER);
+        boolean isTagIdLessThanOne = tagIds.stream()
+                .anyMatch(tagId -> tagId < 1);
+        if (isTagIdLessThanOne) {
+            throw new SuperpositionAdminException(ProductWithTagErrorCode.INDEX_MIN);
         }
-    }
-
-    public Set<Long> getTagIds() {
-        return tags.stream()
-                .map(RequestCreateTag::getTagId)
-                .collect(Collectors.toSet());
     }
 }

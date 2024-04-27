@@ -15,7 +15,7 @@ import com.sppart.admin.product.domain.mapper.ProductMapper;
 import com.sppart.admin.product.dto.ProductSearchCondition;
 import com.sppart.admin.product.dto.request.RequestCreateProduct;
 import com.sppart.admin.productwithtag.domain.mapper.ProductWithTagMapper;
-import com.sppart.admin.productwithtag.dto.RequestCreateTag;
+import com.sppart.admin.tag.domain.mapper.TagMapper;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.List;
@@ -29,6 +29,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestConstructor;
 import org.springframework.test.context.TestConstructor.AutowireMode;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @SpringBootTest
@@ -41,7 +42,7 @@ class ProductServiceImplTest {
     private final ProductMapper productMapper;
 
     public ProductServiceImplTest(ProductMapper productMapper, PictureInfoMapper pictureInfoMapper,
-                                  ProductWithTagMapper productWithTagMapper) {
+                                  ProductWithTagMapper productWithTagMapper, TagMapper tagMapper) {
         this.productMapper = productMapper;
         this.productService = new ProductServiceImpl(productMapper,
                 new ObjectStorageService() {
@@ -64,7 +65,7 @@ class ProductServiceImplTest {
                     public void delete(List<String> urls) {
 
                     }
-                }, pictureInfoMapper, productWithTagMapper);
+                }, pictureInfoMapper, productWithTagMapper, tagMapper);
     }
 
     private final String[] extracting = {"productId", "title", "artistName", "tags", "pictureInfo.type", "price"};
@@ -282,24 +283,13 @@ class ProductServiceImplTest {
                 .size("83X59cm (A1)")
                 .year(2023)
                 .build();
-        var tags = Set.of(RequestCreateTag.builder()
-                        .tagId(1L)
-                        .value("청량한")
-                        .build(),
-                RequestCreateTag.builder()
-                        .tagId(15L)
-                        .value("맑은")
-                        .build(),
-                RequestCreateTag.builder()
-                        .tagId(27L)
-                        .value("아련한")
-                        .build());
+        var tagIds = Set.of(1L, 15L, 27L);
         var req = RequestCreateProduct.builder()
                 .title("roses2")
                 .artistName("문소2")
                 .description("나를 위로해주는 아름다운 장미, 그리고 음악과 함께 떠오르는 아련한 기억2")
                 .pictureInfo(requestCreatePictureInfo)
-                .tags(tags)
+                .tagIds(tagIds)
                 .price(250_000)
                 .build();
         var picture = new MockMultipartFile("file", "test.txt", "text/plain",
@@ -327,32 +317,22 @@ class ProductServiceImplTest {
     }
 
     @Test
-    @DisplayName("작품 생성 예외 테스트")
-    void createWithNotValidParameterTest() {
+    @DisplayName("작품 생성 시 태그 이름의 합이 11자를 넘어가면 예외 발생하는 테스트")
+    @Transactional
+    void createWithNotValidTagNameLengthSumTest() {
         //given
         var requestCreatePictureInfo = RequestCreatePictureInfo.builder()
                 .type("고급켄트지에 디지털프린팅")
                 .size("83X59cm (A1)")
                 .year(2023)
                 .build();
-        var tags = Set.of(RequestCreateTag.builder()
-                        .tagId(1L)
-                        .value("청량한")
-                        .build(),
-                RequestCreateTag.builder()
-                        .tagId(19L)
-                        .value("아기자기한")
-                        .build(),
-                RequestCreateTag.builder()
-                        .tagId(21L)
-                        .value("잔망스러운")
-                        .build());
+        var tagIds = Set.of(1L, 19L, 21L);
         var req = RequestCreateProduct.builder()
-                .title("roses2")
-                .artistName("문소2")
-                .description("나를 위로해주는 아름다운 장미, 그리고 음악과 함께 떠오르는 아련한 기억2")
+                .title("roses")
+                .artistName("문소")
+                .description("나를 위로해주는 아름다운 장미, 그리고 음악과 함께 떠오르는 아련한 기억")
                 .pictureInfo(requestCreatePictureInfo)
-                .tags(tags)
+                .tagIds(tagIds)
                 .price(250_000)
                 .build();
         var picture = new MockMultipartFile("file", "test.txt", "text/plain",
@@ -363,8 +343,34 @@ class ProductServiceImplTest {
     }
 
     @Test
-    @DisplayName("작품 생성 예외 테스트2")
-    void createWithNotValidParameter2Test() {
+    @DisplayName("작품 생성 시 태그 ID가 1보다 작으면 예외 발생하는 테스트")
+    @Transactional
+    void createWithNotValidTagIdsTest() {
+        //given
+        var requestCreatePictureInfo = RequestCreatePictureInfo.builder()
+                .type("고급켄트지에 디지털프린팅")
+                .size("83X59cm (A1)")
+                .year(2023)
+                .build();
+        var tagIds = Set.of(0L, 15L, 27L);
+        var req = RequestCreateProduct.builder()
+                .title("roses")
+                .artistName("문소")
+                .description("나를 위로해주는 아름다운 장미, 그리고 음악과 함께 떠오르는 아련한 기억")
+                .pictureInfo(requestCreatePictureInfo)
+                .tagIds(tagIds)
+                .price(250_000)
+                .build();
+        var picture = new MockMultipartFile("file", "test.txt", "text/plain",
+                "test file".getBytes(StandardCharsets.UTF_8));
+
+        //expected
+        assertThrows(SuperpositionAdminException.class, () -> productService.create(req, picture));
+    }
+
+    @Test
+    @DisplayName("작품 생성 시 태그 값이 없으면 예외 발생하는 테스트")
+    void createWithEmptyTagsTest() {
         //given
         var requestCreatePictureInfo = RequestCreatePictureInfo.builder()
                 .type("고급켄트지에 디지털프린팅")
@@ -372,11 +378,11 @@ class ProductServiceImplTest {
                 .year(2023)
                 .build();
         var req = RequestCreateProduct.builder()
-                .title("roses2")
-                .artistName("문소2")
-                .description("나를 위로해주는 아름다운 장미, 그리고 음악과 함께 떠오르는 아련한 기억2")
+                .title("roses")
+                .artistName("문소")
+                .description("나를 위로해주는 아름다운 장미, 그리고 음악과 함께 떠오르는 아련한 기억")
                 .pictureInfo(requestCreatePictureInfo)
-                .tags(Set.of())
+                .tagIds(Set.of())
                 .price(250_000)
                 .build();
         var picture = new MockMultipartFile("file", "test.txt", "text/plain",

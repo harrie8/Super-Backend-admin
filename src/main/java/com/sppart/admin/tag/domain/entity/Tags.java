@@ -32,7 +32,7 @@ public class Tags {
 
     public Set<Long> getIds() {
         return tags.stream()
-                .map(Tag::getTagId)
+                .map(Tag::getTag_id)
                 .collect(Collectors.toSet());
     }
 }

@@ -18,11 +18,9 @@
         </where>
     </select>
 
-    <insert id="save" parameterType="com.sppart.admin.product.domain.entity.Product" useGeneratedKeys="true"
-            keyProperty="product_id">
-        INSERT INTO product(picture, title, artist_name, description, price, basic_view, qr_view, like_count,
-                            order_count)
-        VALUES (#{picture}, #{title}, #{artistName}, #{description}, #{price}, #{basicView}, #{qrView}, #{likeCount},
-                #{orderCount});
+    <insert id="save" parameterType="com.sppart.admin.tag.domain.entity.Tag" useGeneratedKeys="true"
+            keyProperty="tag_id">
+        INSERT INTO tag(name)
+        VALUES (#{name});
     </insert>
 </mapper>

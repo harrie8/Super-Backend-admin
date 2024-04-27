@@ -20,7 +20,7 @@ public class ResponseTag {
 
     public static ResponseTag from(Tag tag) {
         return ResponseTag.builder()
-                .tagId(tag.getTagId())
+                .tagId(tag.getTag_id())
                 .name(tag.getName())
                 .build();
     }

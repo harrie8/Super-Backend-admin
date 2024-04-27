@@ -5,21 +5,23 @@ import com.sppart.admin.exception.SuperpositionAdminException;
 import java.util.Objects;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 @Getter
+@Setter
 @ToString
 public class Tag {
 
-    private final long tagId;
+    private final long tag_id;
     private final String name;
 
     @Builder
-    public Tag(long tagId, String name) {
+    public Tag(long tag_id, String name) {
         if (name == null || name.isEmpty()) {
             throw new SuperpositionAdminException(CommonErrorCode.INVALID_PARAMETER);
         }
-        this.tagId = tagId;
+        this.tag_id = tag_id;
         this.name = name;
     }
 
@@ -32,11 +34,11 @@ public class Tag {
             return false;
         }
         Tag tag = (Tag) o;
-        return getTagId() == tag.getTagId();
+        return getTag_id() == tag.getTag_id();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(getTagId());
+        return Objects.hashCode(getTag_id());
     }
 }

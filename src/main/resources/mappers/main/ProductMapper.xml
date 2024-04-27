@@ -90,6 +90,36 @@
         </if>
     </delete>
 
+    <select id="findDetailProductInfoByIds" parameterType="Long" resultMap="detailProductInfoMap">
+        <if test="productIds != null and !productIds.isEmpty()">
+            SELECT prod.product_id,
+            prod.picture,
+            prod.title,
+            prod.artist_name,
+            prod.description,
+            prod.price,
+            prod.basic_view,
+            prod.qr_view,
+            prod.like_count,
+            prod.order_count,
+            pi.type,
+            pi.size,
+            pi.`year`,
+            t.tag_id AS tagId,
+            t.name AS tagName
+            FROM product AS prod
+            INNER JOIN product_with_tag AS pwt ON pwt.product_id = prod.product_id
+            INNER JOIN tag AS t ON t.tag_id = pwt.tag_id
+            INNER JOIN picture_info AS pi ON pi.product_id = prod.product_id
+            <where>
+                AND prod.product_id IN
+                <foreach collection="productIds" item="productId" open="(" separator="," close=")">
+                    #{productId}
+                </foreach>
+            </where>
+        </if>
+    </select>
+
     <select id="findDetailProductInfoById" parameterType="Long" resultMap="detailProductInfoMap">
         SELECT prod.product_id,
                prod.picture,

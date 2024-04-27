@@ -196,6 +196,7 @@ class ProductServiceImplTest {
         assertAll(() -> {
             assertEquals(ids.size(), actual.getProductDeleteCount());
             assertEquals(ids.size(), actual.getProductWithTagDeleteCount());
+            assertEquals(ids.size(), actual.getPictureInfoDeleteCount());
             assertEquals(beforeProductCount, afterProductCount);
         });
     }

@@ -1,6 +1,7 @@
 package com.sppart.admin.pictureinfo.domain.mapper;
 
 import com.sppart.admin.pictureinfo.dto.RequestCreatePictureInfo;
+import java.util.Set;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -8,4 +9,6 @@ import org.apache.ibatis.annotations.Param;
 public interface PictureInfoMapper {
 
     void saveBy(@Param("productId") Long productId, @Param("req") RequestCreatePictureInfo req);
+
+    int bulkDeleteByProductIds(@Param("productIds") Set<Long> productIds);
 }

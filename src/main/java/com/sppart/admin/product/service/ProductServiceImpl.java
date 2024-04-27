@@ -61,12 +61,26 @@ public class ProductServiceImpl implements ProductService {
         if (ids == null || ids.isEmpty()) {
             return ResponseBulkDeleteProductByIds.zero();
         }
+
+        List<DetailProductInfo> findProducts = productMapper.findDetailProductInfoByIds(ids);
+
+        deletePictures(findProducts);
+
         int productWithTagDeleteCount = productWithTagMapper.bulkDeleteByProductIds(ids);
+        int pictureInfoDeleteCount = pictureInfoMapper.bulkDeleteByProductIds(ids);
         int productDeleteCount = productMapper.bulkDeleteByIds(ids);
         return ResponseBulkDeleteProductByIds.builder()
                 .productDeleteCount(productDeleteCount)
                 .productWithTagDeleteCount(productWithTagDeleteCount)
+                .pictureInfoDeleteCount(pictureInfoDeleteCount)
                 .build();
+    }
+
+    private void deletePictures(List<DetailProductInfo> findProducts) {
+        List<String> pictureUrls = findProducts.stream()
+                .map(DetailProductInfo::getPicture)
+                .toList();
+        objectStorageService.delete(pictureUrls);
     }
 
     // todo 전시 이력 조회 기능 구현

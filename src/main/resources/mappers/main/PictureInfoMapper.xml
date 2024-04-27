@@ -6,4 +6,17 @@
         INSERT INTO picture_info(product_id, type, size, `year`)
         VALUES (#{productId}, #{req.type}, #{req.size}, #{req.year});
     </insert>
+
+    <delete id="bulkDeleteByProductIds">
+        <if test="productIds != null and !productIds.isEmpty()">
+            DELETE
+            FROM picture_info
+            <where>
+                AND product_id IN
+                <foreach collection="productIds" item="productId" open="(" separator="," close=")">
+                    #{productId}
+                </foreach>
+            </where>
+        </if>
+    </delete>
 </mapper>

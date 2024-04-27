@@ -21,4 +21,6 @@ public interface ProductMapper {
     Optional<DetailProductInfo> findDetailProductInfoById(@Param("productId") Long productId);
 
     void save(Product product);
+
+    List<DetailProductInfo> findDetailProductInfoByIds(@Param("productIds") Set<Long> productIds);
 }

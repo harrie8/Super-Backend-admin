@@ -1,9 +1,9 @@
 package com.sppart.admin.product.service;
 
-import com.sppart.admin.exhibition.dto.ResponseBulkDeleteByIds;
 import com.sppart.admin.product.dto.DetailProductInfo;
 import com.sppart.admin.product.dto.ProductSearchCondition;
 import com.sppart.admin.product.dto.request.RequestCreateProduct;
+import com.sppart.admin.product.dto.response.ResponseBulkDeleteProductByIds;
 import com.sppart.admin.product.dto.response.ResponseGetProductsByCondition;
 import com.sppart.admin.product.dto.response.ResponsePaging;
 import java.util.Set;
@@ -13,7 +13,7 @@ public interface ProductService {
 
     ResponsePaging<ResponseGetProductsByCondition> getProductsByCondition(ProductSearchCondition condition);
 
-    ResponseBulkDeleteByIds bulkDeleteByIds(Set<Long> ids);
+    ResponseBulkDeleteProductByIds bulkDeleteByIds(Set<Long> ids);
 
     DetailProductInfo getDetailInfoById(Long productId);
 

@@ -1,11 +1,11 @@
 package com.sppart.admin.product.controller;
 
-import com.sppart.admin.exhibition.dto.ResponseBulkDeleteByIds;
 import com.sppart.admin.exhibition.dto.ResponseGetExhibitionsByCondition;
 import com.sppart.admin.product.dto.DetailProductInfo;
 import com.sppart.admin.product.dto.ProductSearchCondition;
 import com.sppart.admin.product.dto.request.RequestCreateProduct;
 import com.sppart.admin.product.dto.request.RequestGetProducts;
+import com.sppart.admin.product.dto.response.ResponseBulkDeleteProductByIds;
 import com.sppart.admin.product.dto.response.ResponseDetailProductInfo;
 import com.sppart.admin.product.dto.response.ResponseGetProductsByCondition;
 import com.sppart.admin.product.dto.response.ResponsePaging;
@@ -65,7 +65,7 @@ public class ProductController {
     @DeleteMapping
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> bulkDeleteByIds(@ApiParam(value = "삭제하고 싶은 작품 id들") @RequestParam Set<Long> ids) {
-        ResponseBulkDeleteByIds deleteCount = productService.bulkDeleteByIds(ids);
+        ResponseBulkDeleteProductByIds deleteCount = productService.bulkDeleteByIds(ids);
 
         return ResponseEntity.ok(deleteCount.toString());
     }

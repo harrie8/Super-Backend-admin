@@ -1,7 +1,6 @@
 package com.sppart.admin.product.service;
 
 import com.sppart.admin.exception.SuperpositionAdminException;
-import com.sppart.admin.exhibition.dto.ResponseBulkDeleteByIds;
 import com.sppart.admin.objectstorage.service.ObjectStorageService;
 import com.sppart.admin.pictureinfo.domain.mapper.PictureInfoMapper;
 import com.sppart.admin.product.domain.entity.Product;
@@ -9,6 +8,7 @@ import com.sppart.admin.product.domain.mapper.ProductMapper;
 import com.sppart.admin.product.dto.DetailProductInfo;
 import com.sppart.admin.product.dto.ProductSearchCondition;
 import com.sppart.admin.product.dto.request.RequestCreateProduct;
+import com.sppart.admin.product.dto.response.ResponseBulkDeleteProductByIds;
 import com.sppart.admin.product.dto.response.ResponseGetProductsByCondition;
 import com.sppart.admin.product.dto.response.ResponsePaging;
 import com.sppart.admin.product.exception.ProductErrorCode;
@@ -57,14 +57,15 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public ResponseBulkDeleteByIds bulkDeleteByIds(Set<Long> ids) {
+    public ResponseBulkDeleteProductByIds bulkDeleteByIds(Set<Long> ids) {
         if (ids == null || ids.isEmpty()) {
-            return ResponseBulkDeleteByIds.zero();
+            return ResponseBulkDeleteProductByIds.zero();
         }
-        productMapper.bulkDeleteProductWithTagByProductIds(ids);
+        int productWithTagDeleteCount = productWithTagMapper.bulkDeleteByProductIds(ids);
         int productDeleteCount = productMapper.bulkDeleteByIds(ids);
-        return ResponseBulkDeleteByIds.builder()
-                .exhibitionDeleteCount(productDeleteCount)
+        return ResponseBulkDeleteProductByIds.builder()
+                .productDeleteCount(productDeleteCount)
+                .productWithTagDeleteCount(productWithTagDeleteCount)
                 .build();
     }
 
@@ -81,9 +82,9 @@ public class ProductServiceImpl implements ProductService {
     public long create(RequestCreateProduct req, MultipartFile picture) {
         req.validateTags();
 
-//        String uuidFileName = objectStorageService.uploadFile(picture);
+        String uuidFileName = objectStorageService.uploadFile(picture);
 
-        Product product = Product.create("uuidFileName", req);
+        Product product = Product.create(uuidFileName, req);
         productMapper.save(product);
 
         Long productId = product.getProduct_id();

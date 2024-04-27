@@ -176,7 +176,7 @@ class ProductServiceImplTest {
         //then
         var afterProductCount = productMapper.countAll();
         assertAll(() -> {
-            assertEquals(ids.size(), actual.getExhibitionDeleteCount());
+            assertEquals(ids.size(), actual.getProductDeleteCount());
             assertEquals(beforeProductCount, afterProductCount + ids.size());
         });
     }
@@ -194,8 +194,8 @@ class ProductServiceImplTest {
         //then
         var afterProductCount = productMapper.countAll();
         assertAll(() -> {
-            assertEquals(ids.size(), actual.getProductExhibitionDeleteCount());
-            assertEquals(ids.size(), actual.getExhibitionDeleteCount());
+            assertEquals(ids.size(), actual.getProductDeleteCount());
+            assertEquals(ids.size(), actual.getProductWithTagDeleteCount());
             assertEquals(beforeProductCount, afterProductCount);
         });
     }

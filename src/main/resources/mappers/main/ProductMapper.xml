@@ -77,20 +77,6 @@
               GROUP BY prod.product_id) T;
     </select>
 
-    <!--    todo 메서드 옮기기-->
-    <delete id="bulkDeleteProductWithTagByProductIds">
-        <if test="ids != null and !ids.isEmpty()">
-            DELETE
-            FROM product_with_tag
-            <where>
-                AND product_id IN
-                <foreach collection="ids" item="id" open="(" separator="," close=")">
-                    #{id}
-                </foreach>
-            </where>
-        </if>
-    </delete>
-
     <delete id="bulkDeleteByIds">
         <if test="ids != null and !ids.isEmpty()">
             DELETE

@@ -123,7 +123,7 @@ public class ProductServiceImpl implements ProductService {
         Long productId = product.getProduct_id();
         pictureInfoMapper.saveBy(productId, req.getPictureInfo());
 
-        // todo cache 적용해보기
+        // todo cache 적용해보기, name에 unique 걸어서 동시 생성할 때 오류 나오게 수정해보기
         Tags tags = new Tags(tagMapper.findByIds(req.getTagIds()));
         productWithTagMapper.saveBy(productId, tags.getIds());
 

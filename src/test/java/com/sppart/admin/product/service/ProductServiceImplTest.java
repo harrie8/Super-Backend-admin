@@ -303,7 +303,7 @@ class ProductServiceImplTest {
                 () -> productService.getDetailInfoById(notExistsProductId));
     }
 
-    //    @Test
+    @Test
     @DisplayName("작품 생성 테스트")
     void createTest() {
         //given

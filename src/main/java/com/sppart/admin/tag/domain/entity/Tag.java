@@ -1,7 +1,5 @@
 package com.sppart.admin.tag.domain.entity;
 
-import com.sppart.admin.exception.CommonErrorCode;
-import com.sppart.admin.exception.SuperpositionAdminException;
 import java.util.Objects;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,9 +16,6 @@ public class Tag {
 
     @Builder
     public Tag(long tag_id, String name) {
-        if (name == null || name.isEmpty()) {
-            throw new SuperpositionAdminException(CommonErrorCode.INVALID_PARAMETER);
-        }
         this.tag_id = tag_id;
         this.name = name;
     }

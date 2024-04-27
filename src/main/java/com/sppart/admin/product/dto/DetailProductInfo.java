@@ -25,8 +25,6 @@ public class DetailProductInfo {
     private Integer orderCount;
     private PictureInfo pictureInfo;
     private Set<Tag> tags;
-    // todo 전시 관련 값 추가하기
-//    private Set<String> participatedExhibitionTitles;
 
     @Builder
     public DetailProductInfo(Long productId, String picture, String title, String artistName, String description,

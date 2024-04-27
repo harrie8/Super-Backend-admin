@@ -2,7 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sppart.admin.product.domain.mapper.ProductMapper">
 
-    <!--    todo 전시 관련 정보 추가할 수 도 있음-->
     <resultMap id="detailProductInfoMap" type="com.sppart.admin.product.dto.DetailProductInfo">
         <id column="product_id" property="productId"/>
         <result column="picture" property="picture"/>

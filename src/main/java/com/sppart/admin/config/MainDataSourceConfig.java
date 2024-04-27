@@ -21,7 +21,7 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 @MapperScan(value = {"com.sppart.admin.exhibition.domain.mapper", "com.sppart.admin.member.domain.mapper",
         "com.sppart.admin.productexhibition.mapper", "com.sppart.admin.product.domain.mapper",
         "com.sppart.admin.like.mapper", "com.sppart.admin.productwithtag.domain.mapper",
-        "com.sppart.admin.pictureinfo.domain.mapper"})
+        "com.sppart.admin.pictureinfo.domain.mapper", "com.sppart.admin.tag.domain.mapper"})
 public class MainDataSourceConfig {
 
     private final String MAIN_DATA_SOURCE = "MainDataSource";

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sppart.admin.tag.domain.mapper.TagMapper">
+
+    <select id="findAll" resultType="com.sppart.admin.tag.domain.entity.Tag">
+        SELECT *
+        FROM tag;
+    </select>
+
+    <insert id="save" parameterType="com.sppart.admin.product.domain.entity.Product" useGeneratedKeys="true"
+            keyProperty="product_id">
+        INSERT INTO product(picture, title, artist_name, description, price, basic_view, qr_view, like_count,
+                            order_count)
+        VALUES (#{picture}, #{title}, #{artistName}, #{description}, #{price}, #{basicView}, #{qrView}, #{likeCount},
+                #{orderCount});
+    </insert>
+</mapper>

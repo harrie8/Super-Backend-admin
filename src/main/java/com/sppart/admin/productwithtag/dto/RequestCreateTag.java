@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Schema(description = "태그들 생성 요청값")
+@Schema(description = "작품의 태그들 생성 요청값")
 @Getter
 @NoArgsConstructor
 public class RequestCreateTag {

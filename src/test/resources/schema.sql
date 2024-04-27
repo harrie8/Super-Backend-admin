@@ -1,10 +1,3 @@
-DROP TABLE IF EXISTS exhibition;
-DROP TABLE IF EXISTS artist;
-DROP TABLE IF EXISTS product;
-DROP TABLE IF EXISTS product_with_tag;
-DROP TABLE IF EXISTS tag;
-DROP TABLE IF EXISTS product_exhibition;
-
 CREATE TABLE exhibition
 (
     exhibition_id int          NOT NULL AUTO_INCREMENT,

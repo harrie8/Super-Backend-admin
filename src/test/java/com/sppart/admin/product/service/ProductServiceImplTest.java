@@ -28,23 +28,21 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestConstructor;
 import org.springframework.test.context.TestConstructor.AutowireMode;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.web.multipart.MultipartFile;
 
 @SpringBootTest
 @TestConstructor(autowireMode = AutowireMode.ALL)
 @ActiveProfiles("test")
+@Sql({"classpath:truncate_table.sql", "classpath:test_data.sql"})
 class ProductServiceImplTest {
 
     private final ProductService productService;
     private final ProductMapper productMapper;
-    private final PictureInfoMapper pictureInfoMapper;
-    private final ProductWithTagMapper productWithTagMapper;
 
     public ProductServiceImplTest(ProductMapper productMapper, PictureInfoMapper pictureInfoMapper,
                                   ProductWithTagMapper productWithTagMapper) {
         this.productMapper = productMapper;
-        this.pictureInfoMapper = pictureInfoMapper;
-        this.productWithTagMapper = productWithTagMapper;
         this.productService = new ProductServiceImpl(productMapper,
                 new ObjectStorageService() {
                     @Override

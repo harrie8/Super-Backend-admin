@@ -28,11 +28,13 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestConstructor;
 import org.springframework.test.context.TestConstructor.AutowireMode;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.web.multipart.MultipartFile;
 
 @SpringBootTest
 @TestConstructor(autowireMode = AutowireMode.ALL)
 @ActiveProfiles("test")
+@Sql({"classpath:truncate_table.sql", "classpath:test_data.sql"})
 class ExhibitionServiceImplTest {
 
     private final ExhibitionService exhibitionService;

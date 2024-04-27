@@ -7,8 +7,8 @@ import com.sppart.admin.product.dto.ProductSearchCondition;
 import com.sppart.admin.product.dto.request.RequestCreateProduct;
 import com.sppart.admin.product.dto.request.RequestGetProducts;
 import com.sppart.admin.product.dto.response.ResponseDetailProductInfo;
-import com.sppart.admin.product.dto.response.ResponseGetProductsWithTagsByCondition;
-import com.sppart.admin.product.dto.response.ResponseProductWithTags;
+import com.sppart.admin.product.dto.response.ResponseGetProductsByCondition;
+import com.sppart.admin.product.dto.response.ResponsePaging;
 import com.sppart.admin.product.service.ProductService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -47,7 +47,7 @@ public class ProductController {
     })
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public ResponseGetProductsWithTagsByCondition<ResponseProductWithTags> getExhibitionsByCondition(
+    public ResponsePaging<ResponseGetProductsByCondition> getExhibitionsByCondition(
             @ModelAttribute RequestGetProducts req) {
         ProductSearchCondition condition = ProductSearchCondition.builder()
                 .title(req.getTitle())

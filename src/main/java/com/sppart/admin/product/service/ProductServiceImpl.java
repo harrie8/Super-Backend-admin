@@ -8,10 +8,9 @@ import com.sppart.admin.product.domain.entity.Product;
 import com.sppart.admin.product.domain.mapper.ProductMapper;
 import com.sppart.admin.product.dto.DetailProductInfo;
 import com.sppart.admin.product.dto.ProductSearchCondition;
-import com.sppart.admin.product.dto.ProductWithTagsDto;
 import com.sppart.admin.product.dto.request.RequestCreateProduct;
-import com.sppart.admin.product.dto.response.ResponseGetProductsWithTagsByCondition;
-import com.sppart.admin.product.dto.response.ResponseProductWithTags;
+import com.sppart.admin.product.dto.response.ResponseGetProductsByCondition;
+import com.sppart.admin.product.dto.response.ResponsePaging;
 import com.sppart.admin.product.exception.ProductErrorCode;
 import com.sppart.admin.productwithtag.domain.mapper.ProductWithTagMapper;
 import com.sppart.admin.tag.domain.entity.Tags;
@@ -35,24 +34,24 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional(readOnly = true)
-    public ResponseGetProductsWithTagsByCondition<ResponseProductWithTags> getProductsByCondition(
+    public ResponsePaging<ResponseGetProductsByCondition> getProductsByCondition(
             ProductSearchCondition condition) {
         int totalProductCount = productMapper.countAll();
-        List<ProductWithTagsDto> findProductsWithTags = productMapper.findProductsWithTagsByCondition(condition);
+        List<DetailProductInfo> findDetailProductInfos = productMapper.findDetailProductInfosByCondition(condition);
 
-        return toResponse(totalProductCount, findProductsWithTags);
+        return toResponse(totalProductCount, findDetailProductInfos);
     }
 
-    private ResponseGetProductsWithTagsByCondition<ResponseProductWithTags> toResponse(int totalCount,
-                                                                                       List<ProductWithTagsDto> products) {
-        List<ResponseProductWithTags> responseProductWithTags = products.stream()
-                .map(ResponseProductWithTags::of)
+    private ResponsePaging<ResponseGetProductsByCondition> toResponse(int totalCount,
+                                                                      List<DetailProductInfo> detailProductInfos) {
+        List<ResponseGetProductsByCondition> responseDetailProductInfos = detailProductInfos.stream()
+                .map(ResponseGetProductsByCondition::of)
                 .toList();
 
-        return ResponseGetProductsWithTagsByCondition.<ResponseProductWithTags>builder()
+        return ResponsePaging.<ResponseGetProductsByCondition>builder()
                 .totalCount(totalCount)
-                .findResultCount(products.size())
-                .findDomains(responseProductWithTags)
+                .findResultCount(responseDetailProductInfos.size())
+                .findDomains(responseDetailProductInfos)
                 .build();
     }
 
@@ -69,6 +68,7 @@ public class ProductServiceImpl implements ProductService {
                 .build();
     }
 
+    // todo 전시 이력 조회 기능 구현
     @Override
     @Transactional(readOnly = true)
     public DetailProductInfo getDetailInfoById(Long productId) {
@@ -81,9 +81,9 @@ public class ProductServiceImpl implements ProductService {
     public long create(RequestCreateProduct req, MultipartFile picture) {
         req.validateTags();
 
-        String uuidFileName = objectStorageService.uploadFile(picture);
+//        String uuidFileName = objectStorageService.uploadFile(picture);
 
-        Product product = Product.create(uuidFileName, req);
+        Product product = Product.create("uuidFileName", req);
         productMapper.save(product);
 
         Long productId = product.getProduct_id();

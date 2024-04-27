@@ -2,6 +2,7 @@ package com.sppart.admin.product.dto.response;
 
 import com.sppart.admin.pictureinfo.dto.ResponsePictureInfo;
 import com.sppart.admin.product.dto.DetailProductInfo;
+import com.sppart.admin.tag.dto.response.ResponseTag;
 import java.util.Set;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,13 +25,13 @@ public class ResponseDetailProductInfo {
     private Integer likeCount;
     private Integer orderCount;
     private ResponsePictureInfo pictureInfo;
-    private Set<String> tags;
+    private Set<ResponseTag> tags;
 
     @Builder
     public ResponseDetailProductInfo(Long productId, String picture, String title, String artistName,
                                      String description, Integer price, Integer basicView, Integer qrView,
                                      Integer likeCount, Integer orderCount, ResponsePictureInfo pictureInfo,
-                                     Set<String> tags) {
+                                     Set<ResponseTag> tags) {
 
         this.productId = productId;
         this.picture = picture;
@@ -59,7 +60,7 @@ public class ResponseDetailProductInfo {
                 .likeCount(product.getLikeCount())
                 .orderCount(product.getOrderCount())
                 .pictureInfo(ResponsePictureInfo.from(product.getPictureInfo()))
-                .tags(product.getTags())
+                .tags(product.getResponseTags())
                 .build();
     }
 }

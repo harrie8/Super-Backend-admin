@@ -2,29 +2,51 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sppart.admin.product.domain.mapper.ProductMapper">
 
-    <resultMap id="productWithTagsByCondition" type="com.sppart.admin.product.dto.ProductWithTagsDto">
+    <!--    todo 전시 관련 정보 추가할 수 도 있음-->
+    <resultMap id="detailProductInfoMap" type="com.sppart.admin.product.dto.DetailProductInfo">
         <id column="product_id" property="productId"/>
+        <result column="picture" property="picture"/>
         <result column="title" property="title"/>
         <result column="artist_name" property="artistName"/>
         <result column="description" property="description"/>
         <result column="price" property="price"/>
+        <result column="basic_view" property="basicView"/>
+        <result column="qr_view" property="qrView"/>
+        <result column="like_count" property="likeCount"/>
+        <result column="order_count" property="orderCount"/>
         <association property="pictureInfo" resultMap="pictureInfoMap"/>
-        <collection property="tags" ofType="string">
-            <result column="tagName"/>
-        </collection>
+        <collection property="tags" resultMap="tagMap"/>
     </resultMap>
 
-    <!--    todo 등록일자로 정렬되게 수정하기 -->
-    <select id="findProductsWithTagsByCondition"
+    <resultMap id="pictureInfoMap" type="com.sppart.admin.pictureinfo.domain.entity.PictureInfo">
+        <id property="product_id" column="product_id"/>
+        <result column="type" property="type"/>
+        <result column="size" property="size"/>
+        <result column="year" property="year"/>
+    </resultMap>
+
+    <resultMap id="tagMap" type="com.sppart.admin.tag.domain.entity.Tag">
+        <id property="tag_id" column="tagId"/>
+        <result property="name" column="tagName"/>
+    </resultMap>
+
+    <select id="findDetailProductInfosByCondition"
             parameterType="com.sppart.admin.product.dto.ProductSearchCondition"
-            resultMap="productWithTagsByCondition">
+            resultMap="detailProductInfoMap">
         SELECT prod.product_id,
+        prod.picture,
         prod.title,
         prod.artist_name,
+        prod.description,
         prod.price,
+        prod.basic_view,
+        prod.qr_view,
+        prod.like_count,
+        prod.order_count,
         pi.type,
         pi.size,
         pi.`year`,
+        t.tag_id AS tagId,
         t.name AS tagName
         FROM product AS prod
         INNER JOIN product_with_tag AS pwt ON pwt.product_id = prod.product_id
@@ -32,22 +54,30 @@
         INNER JOIN picture_info AS pi ON pi.product_id = prod.product_id
         <where>
             <if test="condition.title != null and condition.title != ''">
-                AND prod.title = #{condition.title}
+                AND UPPER(prod.title) LIKE CONCAT('%', UPPER(#{condition.title}), '%')
             </if>
             <if test="condition.artistName != null and condition.artistName != ''">
-                AND prod.artist_name = #{condition.artistName}
+                AND UPPER(prod.artist_name) LIKE CONCAT('%', UPPER(#{condition.artistName}), '%')
             </if>
             <if test="condition.productId != null and !condition.productId.equals('')">
-                AND prod.product_id = #{condition.productId};
+                AND prod.product_id = #{condition.productId}
             </if>
         </where>
+        ORDER BY prod.product_id ASC;
     </select>
 
     <select id="countAll" resultType="int">
         SELECT COUNT(*)
-        FROM product;
+        FROM (SELECT COUNT(prod.product_id)
+              FROM product AS prod
+                       INNER JOIN product_with_tag AS pwt
+                                  ON pwt.product_id = prod.product_id
+                       INNER JOIN tag AS t ON t.tag_id = pwt.tag_id
+                       INNER JOIN picture_info AS pi ON pi.product_id = prod.product_id
+              GROUP BY prod.product_id) T;
     </select>
 
+    <!--    todo 메서드 옮기기-->
     <delete id="bulkDeleteProductWithTagByProductIds">
         <if test="ids != null and !ids.isEmpty()">
             DELETE
@@ -74,32 +104,6 @@
         </if>
     </delete>
 
-    <!--    todo 전시 관련 정보 추가할 수 도 있음-->
-    <resultMap id="detailProductInfoMap" type="com.sppart.admin.product.dto.DetailProductInfo">
-        <id column="product_id" property="productId"/>
-        <result column="picture" property="picture"/>
-        <result column="title" property="title"/>
-        <result column="artist_name" property="artistName"/>
-        <result column="description" property="description"/>
-        <result column="price" property="price"/>
-        <result column="basic_view" property="basicView"/>
-        <result column="qr_view" property="qrView"/>
-        <result column="like_count" property="likeCount"/>
-        <result column="order_count" property="orderCount"/>
-        <association property="pictureInfo" resultMap="pictureInfoMap"/>
-        <collection property="tags" ofType="string">
-            <result column="tagName"/>
-        </collection>
-    </resultMap>
-
-    <resultMap id="pictureInfoMap" type="com.sppart.admin.pictureinfo.domain.entity.PictureInfo">
-        <id property="userId" column="userid"/>
-        <result property="product_id" column="product_id"/>
-        <result column="type" property="type"/>
-        <result column="size" property="size"/>
-        <result column="year" property="year"/>
-    </resultMap>
-
     <select id="findDetailProductInfoById" parameterType="Long" resultMap="detailProductInfoMap">
         SELECT prod.product_id,
                prod.picture,
@@ -114,10 +118,11 @@
                pi.type,
                pi.size,
                pi.`year`,
-               t.name AS tagName
+               t.tag_id AS tagId,
+               t.name   AS tagName
         FROM product AS prod
-                 LEFT JOIN product_with_tag AS pwt ON pwt.product_id = prod.product_id
-                 LEFT JOIN tag AS t ON t.tag_id = pwt.tag_id
+                 INNER JOIN product_with_tag AS pwt ON pwt.product_id = prod.product_id
+                 INNER JOIN tag AS t ON t.tag_id = pwt.tag_id
                  INNER JOIN picture_info AS pi ON pi.product_id = prod.product_id
         WHERE prod.product_id = #{productId};
     </select>

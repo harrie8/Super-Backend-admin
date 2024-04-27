@@ -245,8 +245,8 @@ class ProductServiceImplTest {
                                     .build()
                     );
             assertThat(actual.getExhibitionHistory())
-                    .hasSize(1)
-                    .containsKey(ExhibitionStatus.end);
+                    .hasSize(3)
+                    .containsKeys(ExhibitionStatus.end, ExhibitionStatus.upcoming, ExhibitionStatus.current);
         });
     }
 

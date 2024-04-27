@@ -173,12 +173,14 @@ class ExhibitionServiceImplTest {
 
         //then
         assertThat(actual)
-                .hasSize(3)
+                .hasSize(5)
                 .extracting(extracting)
                 .containsExactlyInAnyOrder(
                         id1Exhibition(),
                         id2Exhibition(),
-                        id3Exhibition()
+                        id3Exhibition(),
+                        id14Exhibition(),
+                        id15Exhibition()
                 );
     }
 
@@ -555,7 +557,7 @@ class ExhibitionServiceImplTest {
                 LocalDate.parse("2024-03-03"),
                 ExhibitionStatus.current.getValue(),
                 1,
-                Set.of());
+                Set.of("문소"));
     }
 
     private Tuple id15Exhibition() {
@@ -565,9 +567,9 @@ class ExhibitionServiceImplTest {
                 "MET",
                 LocalDate.parse("2023-12-16"),
                 LocalDate.parse("2024-03-03"),
-                ExhibitionStatus.current.getValue(),
+                ExhibitionStatus.upcoming.getValue(),
                 1,
-                Set.of()
+                Set.of("문소")
         );
     }
 }

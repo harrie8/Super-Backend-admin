@@ -134,7 +134,7 @@ VALUES ('여기는 따뜻해',
         'MET',
         '2023-12-16',
         '2024-03-03',
-        'current',
+        'upcoming',
         'women.jpg',
         1);
 
@@ -818,7 +818,9 @@ VALUES (1, 1),
        (20, 1),
        (1, 2),
        (1, 3),
-       (13, 4);
+       (13, 4),
+       (1, 14),
+       (1, 15);
 
 
 INSERT INTO picture_info (product_id, type, size, `year`)

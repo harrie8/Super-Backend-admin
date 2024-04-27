@@ -1,5 +1,6 @@
 package com.sppart.admin.productexhibition.mapper;
 
+import com.sppart.admin.productexhibition.dto.ExhibitionHistoryOfProductDto;
 import com.sppart.admin.productexhibition.dto.ProductExhibitionDto;
 import java.util.List;
 import java.util.Set;
@@ -15,4 +16,6 @@ public interface ProductExhibitionMapper {
     void bulkInsertByExhibitionId(@Param("exhibitionId") Long exhibitionId, @Param("productIds") Set<Long> productIds);
 
     List<ProductExhibitionDto> findByExhibitionId(@Param("exhibitionId") Long exhibitionId);
+
+    List<ExhibitionHistoryOfProductDto> findExhibitionHistoryOfProductByProductId(@Param("productId") Long productId);
 }

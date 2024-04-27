@@ -1,8 +1,12 @@
 package com.sppart.admin.product.dto.response;
 
+import com.sppart.admin.exhibition.domain.entity.ExhibitionStatus;
 import com.sppart.admin.pictureinfo.dto.ResponsePictureInfo;
 import com.sppart.admin.product.dto.DetailProductInfo;
+import com.sppart.admin.productexhibition.dto.ExhibitionHistoryOfProductDto;
 import com.sppart.admin.tag.dto.response.ResponseTag;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import lombok.Builder;
 import lombok.Getter;
@@ -26,13 +30,14 @@ public class ResponseDetailProductInfo {
     private Integer orderCount;
     private ResponsePictureInfo pictureInfo;
     private Set<ResponseTag> tags;
+    private Map<ExhibitionStatus, List<ExhibitionHistoryOfProductDto>> exhibitionHistory;
 
     @Builder
     public ResponseDetailProductInfo(Long productId, String picture, String title, String artistName,
                                      String description, Integer price, Integer basicView, Integer qrView,
                                      Integer likeCount, Integer orderCount, ResponsePictureInfo pictureInfo,
-                                     Set<ResponseTag> tags) {
-
+                                     Set<ResponseTag> tags,
+                                     Map<ExhibitionStatus, List<ExhibitionHistoryOfProductDto>> exhibitionHistory) {
         this.productId = productId;
         this.picture = picture;
         this.title = title;
@@ -45,9 +50,11 @@ public class ResponseDetailProductInfo {
         this.orderCount = orderCount;
         this.pictureInfo = pictureInfo;
         this.tags = tags;
+        this.exhibitionHistory = exhibitionHistory;
     }
 
-    public static ResponseDetailProductInfo from(final DetailProductInfo product) {
+    public static ResponseDetailProductInfo from(final DetailProductInfo product,
+                                                 final Map<ExhibitionStatus, List<ExhibitionHistoryOfProductDto>> exhibitionHistory) {
         return ResponseDetailProductInfo.builder()
                 .productId(product.getProductId())
                 .picture(product.getPicture())
@@ -61,6 +68,7 @@ public class ResponseDetailProductInfo {
                 .orderCount(product.getOrderCount())
                 .pictureInfo(ResponsePictureInfo.from(product.getPictureInfo()))
                 .tags(product.getResponseTags())
+                .exhibitionHistory(exhibitionHistory)
                 .build();
     }
 }

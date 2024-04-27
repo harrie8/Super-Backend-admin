@@ -1,7 +1,6 @@
 package com.sppart.admin.product.controller;
 
 import com.sppart.admin.exhibition.dto.ResponseGetExhibitionsByCondition;
-import com.sppart.admin.product.dto.DetailProductInfo;
 import com.sppart.admin.product.dto.ProductSearchCondition;
 import com.sppart.admin.product.dto.request.RequestCreateProduct;
 import com.sppart.admin.product.dto.request.RequestGetProducts;
@@ -79,8 +78,7 @@ public class ProductController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseDetailProductInfo getDetailProductInfoById(@ApiParam(value = "작품 ID") @PathVariable Long productId) {
 
-        DetailProductInfo result = productService.getDetailInfoById(productId);
-        return ResponseDetailProductInfo.from(result);
+        return productService.getDetailInfoById(productId);
     }
 
     @ApiOperation(value = "작품 등록 - 신규 작품 등록", notes = "작품 정보 및 작품 이미지를 생성하는 API입니다.")

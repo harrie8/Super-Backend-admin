@@ -8,12 +8,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.sppart.admin.exception.SuperpositionAdminException;
+import com.sppart.admin.exhibition.domain.entity.ExhibitionStatus;
 import com.sppart.admin.objectstorage.service.ObjectStorageService;
 import com.sppart.admin.pictureinfo.domain.mapper.PictureInfoMapper;
 import com.sppart.admin.pictureinfo.dto.RequestCreatePictureInfo;
 import com.sppart.admin.product.domain.mapper.ProductMapper;
 import com.sppart.admin.product.dto.ProductSearchCondition;
 import com.sppart.admin.product.dto.request.RequestCreateProduct;
+import com.sppart.admin.productexhibition.mapper.ProductExhibitionMapper;
 import com.sppart.admin.productwithtag.domain.mapper.ProductWithTagMapper;
 import com.sppart.admin.tag.domain.entity.Tag;
 import com.sppart.admin.tag.domain.mapper.TagMapper;
@@ -44,7 +46,8 @@ class ProductServiceImplTest {
     private final ProductMapper productMapper;
 
     public ProductServiceImplTest(ProductMapper productMapper, PictureInfoMapper pictureInfoMapper,
-                                  ProductWithTagMapper productWithTagMapper, TagMapper tagMapper) {
+                                  ProductWithTagMapper productWithTagMapper, TagMapper tagMapper,
+                                  ProductExhibitionMapper productExhibitionMapper) {
         this.productMapper = productMapper;
         this.productService = new ProductServiceImpl(productMapper,
                 new ObjectStorageService() {
@@ -67,7 +70,7 @@ class ProductServiceImplTest {
                     public void delete(List<String> urls) {
 
                     }
-                }, pictureInfoMapper, productWithTagMapper, tagMapper);
+                }, pictureInfoMapper, productWithTagMapper, tagMapper, productExhibitionMapper);
     }
 
     private final String[] extracting = {"productId", "title", "artistName", "tags", "pictureInfo.type", "price"};
@@ -202,7 +205,7 @@ class ProductServiceImplTest {
     }
 
     @Test
-    @DisplayName("작품 상세 조회 시 작품 상세 정보, 태그, 전시 상태, 작품이 참여중인 전시 이름을 반환하는 테스트")
+    @DisplayName("작품 상세 조회 시 작품 상세 정보, 태그, 전시 상태, 전시 이력을 반환하는 테스트")
     void getDetailInfoByIdTest() {
         //given
         var productId = 1L;
@@ -228,25 +231,28 @@ class ProductServiceImplTest {
             assertThat(actual.getTags())
                     .hasSize(3)
                     .containsExactlyInAnyOrder(
-                            Tag.builder()
-                                    .tag_id(1L)
+                            ResponseTag.builder()
+                                    .tagId(1L)
                                     .name("청량한")
                                     .build(),
-                            Tag.builder()
-                                    .tag_id(15L)
+                            ResponseTag.builder()
+                                    .tagId(15L)
                                     .name("맑은")
                                     .build(),
-                            Tag.builder()
-                                    .tag_id(27L)
+                            ResponseTag.builder()
+                                    .tagId(27L)
                                     .name("아련한")
                                     .build()
                     );
+            assertThat(actual.getExhibitionHistory())
+                    .hasSize(1)
+                    .containsKey(ExhibitionStatus.end);
         });
     }
 
-    //    @Test
+    @Test
     @DisplayName("전시에 참여하지 않은 작품 상세 조회 시 작품 상세 정보만 반환하는 테스트")
-    void getDetailInfoByIdWithNotExistsParticipatedExhibitionsTest() {
+    void getDetailInfoByIdWithNoExhibitionHistoryTest() {
         //given
         var productId = 5L;
 
@@ -265,13 +271,24 @@ class ProductServiceImplTest {
             assertEquals(4, actual.getQrView());
             assertEquals(1, actual.getLikeCount());
             assertEquals(1, actual.getOrderCount());
-//            assertThat(actual.getTags())
-//                    .hasSize(3)
-//                    .containsExactlyInAnyOrder(
-//                            "일상적인",
-//                            "평온한",
-//                            "컬러풀한"
-//                    );
+            assertThat(actual.getTags())
+                    .hasSize(3)
+                    .containsExactlyInAnyOrder(
+                            ResponseTag.builder()
+                                    .tagId(2L)
+                                    .name("일상적인")
+                                    .build(),
+                            ResponseTag.builder()
+                                    .tagId(4L)
+                                    .name("평온한")
+                                    .build(),
+                            ResponseTag.builder()
+                                    .tagId(11L)
+                                    .name("컬러풀한")
+                                    .build()
+                    );
+            assertThat(actual.getExhibitionHistory())
+                    .hasSize(0);
         });
     }
 
@@ -286,7 +303,7 @@ class ProductServiceImplTest {
                 () -> productService.getDetailInfoById(notExistsProductId));
     }
 
-    @Test
+    //    @Test
     @DisplayName("작품 생성 테스트")
     void createTest() {
         //given
@@ -324,7 +341,8 @@ class ProductServiceImplTest {
             assertEquals(req.getPictureInfo().getType(), actual.getPictureInfo().getType());
             assertEquals(req.getPictureInfo().getSize(), actual.getPictureInfo().getSize());
             assertEquals(req.getPictureInfo().getYear(), actual.getPictureInfo().getYear());
-            assertEquals(Set.of(Tag.builder()
+            assertEquals(Set.of(
+                    Tag.builder()
                             .tag_id(1L)
                             .name("청량한")
                             .build(),

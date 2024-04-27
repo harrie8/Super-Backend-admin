@@ -1,6 +1,9 @@
 package com.sppart.admin.product.service;
 
+import static java.util.stream.Collectors.groupingBy;
+
 import com.sppart.admin.exception.SuperpositionAdminException;
+import com.sppart.admin.exhibition.domain.entity.ExhibitionStatus;
 import com.sppart.admin.objectstorage.service.ObjectStorageService;
 import com.sppart.admin.pictureinfo.domain.mapper.PictureInfoMapper;
 import com.sppart.admin.product.domain.entity.Product;
@@ -9,13 +12,17 @@ import com.sppart.admin.product.dto.DetailProductInfo;
 import com.sppart.admin.product.dto.ProductSearchCondition;
 import com.sppart.admin.product.dto.request.RequestCreateProduct;
 import com.sppart.admin.product.dto.response.ResponseBulkDeleteProductByIds;
+import com.sppart.admin.product.dto.response.ResponseDetailProductInfo;
 import com.sppart.admin.product.dto.response.ResponseGetProductsByCondition;
 import com.sppart.admin.product.dto.response.ResponsePaging;
 import com.sppart.admin.product.exception.ProductErrorCode;
+import com.sppart.admin.productexhibition.dto.ExhibitionHistoryOfProductDto;
+import com.sppart.admin.productexhibition.mapper.ProductExhibitionMapper;
 import com.sppart.admin.productwithtag.domain.mapper.ProductWithTagMapper;
 import com.sppart.admin.tag.domain.entity.Tags;
 import com.sppart.admin.tag.domain.mapper.TagMapper;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,6 +38,7 @@ public class ProductServiceImpl implements ProductService {
     private final PictureInfoMapper pictureInfoMapper;
     private final ProductWithTagMapper productWithTagMapper;
     private final TagMapper tagMapper;
+    private final ProductExhibitionMapper productExhibitionMapper;
 
     @Override
     @Transactional(readOnly = true)
@@ -83,12 +91,23 @@ public class ProductServiceImpl implements ProductService {
         objectStorageService.delete(pictureUrls);
     }
 
-    // todo 전시 이력 조회 기능 구현
     @Override
     @Transactional(readOnly = true)
-    public DetailProductInfo getDetailInfoById(Long productId) {
-        return productMapper.findDetailProductInfoById(productId)
+    public ResponseDetailProductInfo getDetailInfoById(Long productId) {
+        DetailProductInfo findDetailProductInfo = productMapper.findDetailProductInfoById(productId)
                 .orElseThrow(() -> new SuperpositionAdminException(ProductErrorCode.NOT_FOUND));
+        Map<ExhibitionStatus, List<ExhibitionHistoryOfProductDto>> exhibitionHistory = getExhibitionHistory(
+                findDetailProductInfo);
+
+        return ResponseDetailProductInfo.from(findDetailProductInfo, exhibitionHistory);
+    }
+
+    private Map<ExhibitionStatus, List<ExhibitionHistoryOfProductDto>> getExhibitionHistory(
+            DetailProductInfo findDetailProductInfo) {
+        List<ExhibitionHistoryOfProductDto> findExhibitionHistoryOfProduct = productExhibitionMapper.findExhibitionHistoryOfProductByProductId(
+                findDetailProductInfo.getProductId());
+        return findExhibitionHistoryOfProduct.stream()
+                .collect(groupingBy(ExhibitionHistoryOfProductDto::getExhibitionStatus));
     }
 
     @Override

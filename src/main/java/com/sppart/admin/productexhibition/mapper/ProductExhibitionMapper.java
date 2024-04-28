@@ -18,4 +18,6 @@ public interface ProductExhibitionMapper {
     List<ProductExhibitionDto> findByExhibitionId(@Param("exhibitionId") Long exhibitionId);
 
     List<ExhibitionHistoryOfProductDto> findExhibitionHistoryOfProductByProductId(@Param("productId") Long productId);
+
+    void deleteByExhibitionId(@Param("exhibitionId") Long exhibitionId);
 }

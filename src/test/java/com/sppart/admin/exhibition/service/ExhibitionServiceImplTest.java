@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.groups.Tuple.tuple;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.sppart.admin.exception.SuperpositionAdminException;
@@ -13,6 +12,7 @@ import com.sppart.admin.exhibition.domain.mapper.ExhibitionMapper;
 import com.sppart.admin.exhibition.dto.ExhibitionSearchCondition;
 import com.sppart.admin.exhibition.dto.RequestUpdateExhibitionDisplay;
 import com.sppart.admin.exhibition.dto.request.RequestCreateExhibition;
+import com.sppart.admin.exhibition.dto.request.RequestUpdateExhibition;
 import com.sppart.admin.objectstorage.service.ObjectStorageService;
 import com.sppart.admin.productexhibition.mapper.ProductExhibitionMapper;
 import java.nio.charset.StandardCharsets;
@@ -49,7 +49,7 @@ class ExhibitionServiceImplTest {
                 new ObjectStorageService() {
                     @Override
                     public String uploadFile(MultipartFile file) {
-                        return "";
+                        return file.getName();
                     }
 
                     @Override
@@ -415,7 +415,7 @@ class ExhibitionServiceImplTest {
             assertEquals(req.getStartDate(), actual.getStartDate());
             assertEquals(req.getEndDate(), actual.getEndDate());
             assertEquals(ExhibitionStatus.findByName(req.getStatus()), actual.getStatus());
-            assertNotNull(actual.getPoster());
+            assertEquals(poster.getName(), actual.getPoster());
             assertThat(productExhibitions)
                     .hasSize(3)
                     .extracting("productId", "exhibitionId")
@@ -424,6 +424,106 @@ class ExhibitionServiceImplTest {
                             tuple(2L, createdExhibitionId),
                             tuple(3L, createdExhibitionId)
                     );
+        });
+    }
+
+    @Test
+    @DisplayName("전시 수정 테스트")
+    void updateTest() {
+        //given
+        var createReq = RequestCreateExhibition.builder()
+                .title("제목입니다.")
+                .subHeading("부제목입니다.")
+                .startDate(LocalDate.parse("2024-01-01"))
+                .endDate(LocalDate.parse("2024-05-01"))
+                .location("장소입니다.")
+                .status(ExhibitionStatus.current.name())
+                .productIds(Set.of(1L, 2L, 3L))
+                .build();
+        var createPoster = new MockMultipartFile("file", "test.txt", "text/plain",
+                "test file".getBytes(StandardCharsets.UTF_8));
+        var createdExhibitionId = exhibitionService.create(createReq, createPoster);
+
+        var req = RequestUpdateExhibition.builder()
+                .title("제목입니다.-edit")
+                .subHeading("부제목입니다.-edit")
+                .startDate(LocalDate.parse("2024-01-02"))
+                .endDate(LocalDate.parse("2024-05-02"))
+                .location("장소입니다.-edit")
+                .status(ExhibitionStatus.upcoming)
+                .oldPoster(createPoster.getName())
+                .productIds(Set.of(4L, 5L))
+                .build();
+        var poster = new MockMultipartFile("file-edit", "test.txt", "text/plain",
+                "test file".getBytes(StandardCharsets.UTF_8));
+
+        //when
+        exhibitionService.update(createdExhibitionId, req, poster);
+
+        //then
+        var actual = exhibitionMapper.findById(createdExhibitionId).get();
+        var productExhibitions = productExhibitionMapper.findByExhibitionId(createdExhibitionId);
+        assertAll(() -> {
+            assertEquals(req.getTitle(), actual.getTitle());
+            assertEquals(req.getSubHeading(), actual.getSubHeading());
+            assertEquals(req.getLocation(), actual.getLocation());
+            assertEquals(req.getStartDate(), actual.getStartDate());
+            assertEquals(req.getEndDate(), actual.getEndDate());
+            assertEquals(req.getStatus(), actual.getStatus());
+            assertEquals(poster.getName(), actual.getPoster());
+            assertThat(productExhibitions)
+                    .hasSize(2)
+                    .extracting("productId", "exhibitionId")
+                    .containsExactlyInAnyOrder(
+                            tuple(4L, createdExhibitionId),
+                            tuple(5L, createdExhibitionId)
+                    );
+        });
+    }
+
+    @Test
+    @DisplayName("전시 수정 시 이미지를 첨부하지 않으면 기존 이미지를 그대로 사용하며, 작품 ID가 비어있다면 작품 등록을 하지 않는 테스트")
+    void updateWithOldPictureAndEmptyProductIdsTest() {
+        //given
+        var createReq = RequestCreateExhibition.builder()
+                .title("제목입니다.")
+                .subHeading("부제목입니다.")
+                .startDate(LocalDate.parse("2024-01-01"))
+                .endDate(LocalDate.parse("2024-05-01"))
+                .location("장소입니다.")
+                .status(ExhibitionStatus.current.name())
+                .productIds(Set.of(1L, 2L, 3L))
+                .build();
+        var createPoster = new MockMultipartFile("file", "test.txt", "text/plain",
+                "test file".getBytes(StandardCharsets.UTF_8));
+        var createdExhibitionId = exhibitionService.create(createReq, createPoster);
+
+        var req = RequestUpdateExhibition.builder()
+                .title("제목입니다.-edit")
+                .subHeading("부제목입니다.-edit")
+                .startDate(LocalDate.parse("2024-01-02"))
+                .endDate(LocalDate.parse("2024-05-02"))
+                .location("장소입니다.-edit")
+                .status(ExhibitionStatus.upcoming)
+                .oldPoster(createPoster.getName())
+                .productIds(Set.of())
+                .build();
+
+        //when
+        exhibitionService.update(createdExhibitionId, req, null);
+
+        //then
+        var actual = exhibitionMapper.findById(createdExhibitionId).get();
+        var productExhibitions = productExhibitionMapper.findByExhibitionId(createdExhibitionId);
+        assertAll(() -> {
+            assertEquals(req.getTitle(), actual.getTitle());
+            assertEquals(req.getSubHeading(), actual.getSubHeading());
+            assertEquals(req.getLocation(), actual.getLocation());
+            assertEquals(req.getStartDate(), actual.getStartDate());
+            assertEquals(req.getEndDate(), actual.getEndDate());
+            assertEquals(req.getStatus(), actual.getStatus());
+            assertEquals(req.getOldPoster(), actual.getPoster());
+            assertThat(productExhibitions).isEmpty();
         });
     }
 

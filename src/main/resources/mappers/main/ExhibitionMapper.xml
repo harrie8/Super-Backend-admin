@@ -127,4 +127,16 @@
         INSERT INTO exhibition(title, subHeading, start_date, end_date, location, status, poster, is_display)
         VALUES (#{title}, #{subHeading}, #{startDate}, #{endDate}, #{location}, #{status}, #{poster}, #{isDisplay});
     </insert>
+
+    <update id="update">
+        UPDATE exhibition
+        SET title      = #{req.title},
+            subHeading = #{req.subHeading},
+            location   = #{req.location},
+            start_date = #{req.startDate},
+            end_date   = #{req.endDate},
+            status     = #{req.status},
+            poster     = #{poster}
+        WHERE exhibition_id = #{exhibitionId};
+    </update>
 </mapper>

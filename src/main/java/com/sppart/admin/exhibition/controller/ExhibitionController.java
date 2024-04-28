@@ -7,6 +7,7 @@ import com.sppart.admin.exhibition.dto.ResponseBulkDeleteByIds;
 import com.sppart.admin.exhibition.dto.ResponseGetExhibitionsByCondition;
 import com.sppart.admin.exhibition.dto.request.RequestCreateExhibition;
 import com.sppart.admin.exhibition.dto.request.RequestGetExhibitions;
+import com.sppart.admin.exhibition.dto.request.RequestUpdateExhibition;
 import com.sppart.admin.exhibition.dto.response.ResponseExhibitionWithParticipatedProducts;
 import com.sppart.admin.exhibition.service.ExhibitionService;
 import io.swagger.annotations.Api;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -59,9 +61,9 @@ public class ExhibitionController {
         return exhibitionService.getExhibitionsByCondition(condition);
     }
 
-    @ApiOperation(value = "전시 목록 - 선택 삭제", notes = "삭제하고 싶은 전시 번호들로 전시들을 삭제하는 API입니다.")
+    @ApiOperation(value = "전시 목록 - 선택 삭제", notes = "삭제하고 싶은 전시 번호들로 전시들과 해당 전시에 참여한 작품 이력도 삭제하는 API입니다.")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "전시 삭제 성공 - 삭제 성공한 전시의 개수를 반환합니다.", response = String.class),
+            @ApiResponse(code = 200, message = "전시 삭제 성공 - 삭제 성공한 전시의 개수와 작품 참여 이력 개수를 반환합니다.", response = String.class),
     })
     @DeleteMapping
     @ResponseStatus(HttpStatus.OK)
@@ -109,5 +111,19 @@ public class ExhibitionController {
     public void createExhibition(@Valid @RequestPart RequestCreateExhibition req,
                                  @ApiParam(value = "포스터 이미지 파일") @RequestPart MultipartFile poster) {
         exhibitionService.create(req, poster);
+    }
+
+    @ApiOperation(value = "전시 수정", notes = "전시의 정보룰 수정하는 API입니다.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "전시 수정 성공", response = String.class)
+    })
+    @PutMapping("/{exhibitionId}")
+    @ResponseStatus(HttpStatus.OK)
+    public String updateExhibition(@ApiParam(value = "작품 ID") @PathVariable Long exhibitionId,
+                                   @Valid @RequestPart RequestUpdateExhibition req,
+                                   @ApiParam(value = "전시 포스터 파일") @RequestPart(required = false) MultipartFile poster) {
+        exhibitionService.update(exhibitionId, req, poster);
+
+        return "exhibition update success";
     }
 }

@@ -12,6 +12,7 @@ import com.sppart.admin.exhibition.dto.ResponseBulkDeleteByIds;
 import com.sppart.admin.exhibition.dto.ResponseExhibitionByCondition;
 import com.sppart.admin.exhibition.dto.ResponseGetExhibitionsByCondition;
 import com.sppart.admin.exhibition.dto.request.RequestCreateExhibition;
+import com.sppart.admin.exhibition.dto.request.RequestUpdateExhibition;
 import com.sppart.admin.exhibition.exception.ExhibitionErrorCode;
 import com.sppart.admin.objectstorage.service.ObjectStorageService;
 import com.sppart.admin.product.dto.ProductOnlyArtistNameDto;
@@ -123,5 +124,23 @@ public class ExhibitionServiceImpl implements ExhibitionService {
         productExhibitionMapper.bulkInsertByExhibitionId(exhibition.getId(), req.getProductIds());
 
         return exhibition.getId();
+    }
+
+    @Override
+    public void update(Long exhibitionId, RequestUpdateExhibition req, MultipartFile poster) {
+        String posterURL = getPosterURL(req, poster);
+
+        exhibitionMapper.update(exhibitionId, posterURL, req);
+
+        productExhibitionMapper.deleteByExhibitionId(exhibitionId);
+        productExhibitionMapper.bulkInsertByExhibitionId(exhibitionId, req.getProductIds());
+    }
+
+    private String getPosterURL(RequestUpdateExhibition req, MultipartFile poster) {
+        if (poster != null && !poster.isEmpty()) {
+            objectStorageService.delete(req.getOldPoster());
+            return objectStorageService.uploadFile(poster);
+        }
+        return req.getOldPoster();
     }
 }

@@ -71,9 +71,7 @@ public class ProductServiceImpl implements ProductService {
             return ResponseBulkDeleteProductByIds.zero();
         }
 
-        List<DetailProductInfo> findProducts = productMapper.findDetailProductInfoByIds(ids);
-
-        deletePictures(findProducts);
+        deletePictures(ids);
 
         int productWithTagDeleteCount = productWithTagMapper.bulkDeleteByProductIds(ids);
         int pictureInfoDeleteCount = pictureInfoMapper.bulkDeleteByProductIds(ids);
@@ -85,7 +83,12 @@ public class ProductServiceImpl implements ProductService {
                 .build();
     }
 
-    private void deletePictures(List<DetailProductInfo> findProducts) {
+    private void deletePictures(Set<Long> ids) {
+        List<DetailProductInfo> findProducts = productMapper.findDetailProductInfoByIds(ids);
+        if (findProducts == null || findProducts.isEmpty()) {
+            return;
+        }
+
         List<String> pictureUrls = findProducts.stream()
                 .map(DetailProductInfo::getPicture)
                 .toList();
@@ -136,13 +139,8 @@ public class ProductServiceImpl implements ProductService {
     public void update(Long productId, RequestUpdateProduct req, MultipartFile picture) {
         req.validateTags();
 
-        String uuidFileName = req.getOldPicture();
-        if (picture != null && !picture.isEmpty()) {
-            objectStorageService.delete(req.getOldPicture());
-            uuidFileName = objectStorageService.uploadFile(picture);
-        }
-
-        productMapper.update(productId, uuidFileName, req);
+        String pictureURL = getPictureURL(req, picture);
+        productMapper.update(productId, pictureURL, req);
 
         pictureInfoMapper.deleteByProductId(productId);
         pictureInfoMapper.saveBy(productId, req.getPictureInfo());
@@ -151,5 +149,13 @@ public class ProductServiceImpl implements ProductService {
         Tags tags = new Tags(tagMapper.findByIds(req.getTagIds()));
         // todo cache 적용해보기, name에 unique 걸어서 동시 생성할 때 오류 나오게 수정해보기
         productWithTagMapper.saveBy(productId, tags.getIds());
+    }
+
+    private String getPictureURL(RequestUpdateProduct req, MultipartFile picture) {
+        if (picture != null && !picture.isEmpty()) {
+            objectStorageService.delete(req.getOldPicture());
+            return objectStorageService.uploadFile(picture);
+        }
+        return req.getOldPicture();
     }
 }

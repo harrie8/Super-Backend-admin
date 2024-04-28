@@ -103,9 +103,8 @@ public class ExhibitionServiceImpl implements ExhibitionService {
     @Override
     @Transactional
     public void updateOnlyDisplay(Long exhibitionId, RequestUpdateExhibitionDisplay req) {
-        Exhibition findExhibition = exhibitionMapper.findById(exhibitionId)
+        exhibitionMapper.findById(exhibitionId)
                 .orElseThrow(() -> new SuperpositionAdminException(ExhibitionErrorCode.NOT_FOUND));
-        findExhibition.changeDisplay(req.getIsDisplay());
         exhibitionMapper.updateOnlyDisplay(exhibitionId, req.getIsDisplay());
     }
 

@@ -18,6 +18,8 @@ public interface ExhibitionMapper {
 
     int countAll();
 
+    List<Exhibition> findByIds(@Param("ids") Set<Long> ids);
+
     int bulkDeleteByIds(@Param("ids") Set<Long> ids);
 
     Optional<Exhibition> findById(@Param("exhibitionId") Long exhibitionId);

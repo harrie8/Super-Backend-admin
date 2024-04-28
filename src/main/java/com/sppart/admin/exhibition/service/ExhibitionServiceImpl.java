@@ -78,12 +78,26 @@ public class ExhibitionServiceImpl implements ExhibitionService {
         if (ids == null || ids.isEmpty()) {
             return ResponseBulkDeleteByIds.zero();
         }
+
+        List<Exhibition> findExhibitions = exhibitionMapper.findByIds(ids);
+        deletePosters(findExhibitions);
+
         int productExhibitionDeleteCount = productExhibitionMapper.bulkDeleteByExhibitionIds(ids);
         int exhibitionDeleteCount = exhibitionMapper.bulkDeleteByIds(ids);
         return ResponseBulkDeleteByIds.builder()
                 .exhibitionDeleteCount(exhibitionDeleteCount)
                 .productExhibitionDeleteCount(productExhibitionDeleteCount)
                 .build();
+    }
+
+    private void deletePosters(List<Exhibition> findExhibitions) {
+        if (findExhibitions.isEmpty()) {
+            return;
+        }
+        List<String> posterUrls = findExhibitions.stream()
+                .map(Exhibition::getPoster)
+                .toList();
+        objectStorageService.delete(posterUrls);
     }
 
     @Override

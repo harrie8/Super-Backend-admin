@@ -42,7 +42,7 @@ public class MemberController {
 
     @PutMapping("/one")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<?> editMemberInfo(@RequestParam UpdateUserInfo userInfo) {
+    public ResponseEntity<?> editMemberInfo(@RequestBody UpdateUserInfo userInfo) {
         return memberService.editMemberInfo(userInfo);
     }
 

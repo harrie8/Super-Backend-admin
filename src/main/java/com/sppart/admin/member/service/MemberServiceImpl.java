@@ -12,6 +12,7 @@ import com.sppart.admin.member.dto.ResponseMemberDetail;
 import com.sppart.admin.member.dto.ResponseMembers;
 import com.sppart.admin.member.dto.UpdateUserInfo;
 import com.sppart.admin.utils.FilterType;
+import com.sppart.admin.utils.Page;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -113,7 +114,7 @@ public class MemberServiceImpl implements MemberService{
                                           int page,
                                           Date startDate, Date endDate,
                                           boolean isAuthor, boolean isActiveMember){
-        int[] pageIndex = getPageIndex(page);
+        int[] pageIndex = Page.getPageIndex(page);
 
         switch (filterType){
             case all -> {
@@ -232,11 +233,5 @@ public class MemberServiceImpl implements MemberService{
     private String setFileName(String extension){
         if (extension == null) return UUID.randomUUID().toString();
         return UUID.randomUUID() + extension;
-    }
-
-    private int[] getPageIndex(int page) {
-        int start = (page-1) * 10;
-        int end = page * 10;
-        return new int[]{start, end};
     }
 }

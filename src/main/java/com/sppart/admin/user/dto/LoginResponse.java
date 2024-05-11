@@ -7,12 +7,12 @@ import lombok.Getter;
 @Getter
 public class LoginResponse {
 
-    private final Users users;
+    private final Users userInfo;
     private final String message;
 
     @Builder
-    public LoginResponse(Users users, String message) {
-        this.users = users;
+    public LoginResponse(Users userInfo, String message) {
+        this.userInfo = userInfo;
         this.message = message;
     }
 }

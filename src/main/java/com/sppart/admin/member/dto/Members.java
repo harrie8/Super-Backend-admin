@@ -3,6 +3,7 @@ package com.sppart.admin.member.dto;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.sql.Timestamp;
 import java.util.Date;
 
 @Getter
@@ -12,6 +13,6 @@ public class Members {
     private String email;
     private String name;
     private boolean isAuthor;
-    private Date createAt;
+    private Timestamp createAt;
     private Date updateAt;
 }

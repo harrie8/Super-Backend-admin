@@ -53,8 +53,7 @@ public class MemberServiceImpl implements MemberService{
 
     @Override
     public ResponseMemberDetail getMemberByEmail(String email) {
-        memberMapper.getMemberByEmail(email);
-        return null;
+        return new ResponseMemberDetail(memberMapper.getMemberByEmail(email));
     }
 
     @Override
@@ -198,7 +197,7 @@ public class MemberServiceImpl implements MemberService{
                             .num(1)
                             .email(member.getEmail())
                             .name(member.getName())
-                            .isAuthor(member.isArtis())
+                            .isAuthor(member.isArtist())
                             .createAt(member.getCreateAt())
                             .updateAt(member.getNicknameUpdateAt()).build()));
         return memberList;

@@ -1,9 +1,12 @@
 package com.sppart.admin.member.dto;
 
+import com.sppart.admin.member.domain.entity.DetailMember;
+import com.sppart.admin.member.domain.entity.Member;
 import com.sppart.admin.utils.Gender;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.sql.Timestamp;
 import java.util.Date;
 
 @Getter
@@ -12,10 +15,30 @@ public class ResponseMemberDetail {
     private int num;
     private String email;
     private Gender gender;
-    private Date birth;
+    private int birth;
     private String image;
     private String userType;
-    private Date createAt;
+    private Timestamp createAt;
     private Date updateAt;
-    private AuthorInfo authorInfo;
+    //추후 추가 예정
+//    private AuthorInfo authorInfo;
+
+    public ResponseMemberDetail(Member member) {
+        this.num = 1;
+        this.email = member.getEmail();
+        this.gender = member.getGender();
+        this.birth = member.getBirthYear();
+        this.image = member.getProfile();
+        if (member.isArtist()) {
+            this.userType = "artist";
+        } else {
+            this.userType = "user";
+        }
+        this.createAt = member.getCreateAt();
+        this.updateAt = member.getNicknameUpdateAt();
+        //추후 추가 예정
+//        this.authorInfo = AuthorInfo.builder()
+//                .id(member.getInstagramId())
+//                .name(member.getArtistName()).build();
+    }
 }

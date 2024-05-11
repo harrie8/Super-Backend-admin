@@ -3,6 +3,7 @@ package com.sppart.admin.member.domain.entity;
 import com.sppart.admin.utils.Gender;
 import lombok.Getter;
 
+import java.sql.Date;
 import java.sql.Timestamp;
 
 @Getter
@@ -13,9 +14,9 @@ public class Member {
     private String profile;
     private Gender gender;
     private int birthYear;
-    private boolean isArtis;
+    private boolean artist;
     private Timestamp createAt;
     private Timestamp deleteAt;
-    private Timestamp nicknameUpdateAt;
+    private Date nicknameUpdateAt;
     private boolean isActive;
 }

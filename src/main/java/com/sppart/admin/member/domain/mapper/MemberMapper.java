@@ -1,5 +1,6 @@
 package com.sppart.admin.member.domain.mapper;
 
+import com.sppart.admin.member.domain.entity.DetailMember;
 import com.sppart.admin.member.domain.entity.Member;
 import com.sppart.admin.utils.Gender;
 import org.apache.ibatis.annotations.Mapper;

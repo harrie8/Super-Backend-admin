@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 
 @RequiredArgsConstructor
-@RestController
+@RestController("/members")
 public class MemberController {
     private final MemberService memberService;
 
-    @GetMapping("/members")
+    @GetMapping
     public ResponseEntity<?> getAllMembers(@RequestParam(value = "startDate", required = false) Date startDate,
                                            @RequestParam(value = "endDate", required = false) Date endDate,
                                            @RequestParam(value = "isAuthor", defaultValue = "false") boolean isAuthor,
@@ -25,7 +25,7 @@ public class MemberController {
         return ResponseEntity.ok(memberService.getAllMembers(startDate, endDate, isAuthor, searchString, filterType, page));
     }
 
-    @GetMapping("/members/inactive")
+    @GetMapping("/inactive")
     public ResponseEntity<?> getAllDeleteMembers(@RequestParam(value = "startDate", required = false) Date startDate,
                                            @RequestParam(value = "endDate", required = false) Date endDate,
                                            @RequestParam(value = "isAuthor", defaultValue = "false") boolean isAuthor,
@@ -35,24 +35,24 @@ public class MemberController {
         return ResponseEntity.ok(memberService.getDeleteMembers(startDate, endDate, isAuthor, searchString, filterType, page));
     }
 
-    @GetMapping("/members/one")
+    @GetMapping("/one")
     public ResponseEntity<?> getMemberByEmail(@RequestParam(value = "email") String email) {
         return ResponseEntity.ok(memberService.getMemberByEmail(email));
     }
 
-    @PutMapping("/member/one")
+    @PutMapping("/one")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<?> editMemberInfo(@RequestParam UpdateUserInfo userInfo) {
         return memberService.editMemberInfo(userInfo);
     }
 
-    @DeleteMapping("/members")
+    @DeleteMapping
     @ResponseStatus(HttpStatus.OK)
     public void deleteMemberByEmail(@RequestParam(value = "email") String[] email) {
         memberService.deleteMemberByEmail(email);
     }
 
-    @GetMapping("/api/check-name")
+    @GetMapping("/check-name")
     public ResponseEntity<?> checkDuplicateName(@RequestParam("name") String name) {
         if (memberService.isDuplicateName(name)) {
             return ResponseEntity.ok("success.");

@@ -1,6 +1,5 @@
 package com.sppart.admin.member.service;
 
-import com.amazonaws.services.s3.AmazonS3;
 import com.sppart.admin.member.domain.entity.Member;
 import com.sppart.admin.member.domain.mapper.MemberMapper;
 import com.sppart.admin.member.dto.Members;
@@ -12,7 +11,6 @@ import com.sppart.admin.utils.FilterType;
 import com.sppart.admin.utils.Page;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -24,11 +22,7 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService{
-    @Value("${naver.objectStorage.bucketName}")
-    private String bucketName;
-
     private final MemberMapper memberMapper;
-    private final AmazonS3 awsS3Client;
     private final ObjectStorageService objectStorageService;
 
     @Override

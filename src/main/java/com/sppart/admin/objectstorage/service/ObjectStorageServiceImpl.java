@@ -4,14 +4,14 @@ import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.UUID;
+import java.util.*;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
@@ -25,6 +25,7 @@ public class ObjectStorageServiceImpl implements ObjectStorageService {
     private String bucket;
 
     @Override
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public String uploadFile(MultipartFile file) {
         String fileName = createUUIDFileName(file.getOriginalFilename());
 
@@ -43,6 +44,7 @@ public class ObjectStorageServiceImpl implements ObjectStorageService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public List<String> uploadFiles(List<MultipartFile> files) {
         List<String> fileNames = new ArrayList<>();
         for (MultipartFile file : files) {

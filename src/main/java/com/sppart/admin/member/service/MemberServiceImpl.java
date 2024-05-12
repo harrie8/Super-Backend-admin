@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -97,8 +98,8 @@ public class MemberServiceImpl implements MemberService{
         return memberMapper.isDuplicateName(name);
     }
 
-    @Transactional
-    public List<Members> getMemberListByFilter(FilterType filterType,
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public List<?> getMemberListByFilter(FilterType filterType,
                                           String searchString,
                                           int page,
                                           Date startDate, Date endDate,
@@ -107,33 +108,15 @@ public class MemberServiceImpl implements MemberService{
 
         switch (filterType){
             case all -> {
-                if (Objects.nonNull(startDate)) {
-                    if (isAuthor) return getArtistMembersByDate(startDate, endDate, pageIndex, isActiveMember);
-                    else return getMembersByDate(startDate, endDate, pageIndex, isActiveMember);
-                } else {
-                    if (isAuthor) return getArtistMembers(pageIndex, isActiveMember);
-                    else return entityToResponse(memberMapper.getAllMembers(pageIndex[0], pageIndex[1], isActiveMember));
-                }
+                return handleAllFilter(startDate, endDate, pageIndex, isAuthor, isActiveMember);
             }
 
             case email -> {
-                if (Objects.nonNull(startDate)) {
-                    if (isAuthor) return getArtistMembersByDateAndEmail(searchString, startDate, endDate, pageIndex, isActiveMember);
-                    else return getMembersByDateAndEmail(searchString, startDate, endDate, pageIndex, isActiveMember);
-                } else {
-                    if (isAuthor) return getArtistMembersByEmail(searchString, pageIndex, isActiveMember);
-                    else return entityToResponse(memberMapper.getMembersByEmail(searchString, pageIndex[0], pageIndex[1], isActiveMember));
-                }
+                return handleEmailFilter(searchString, startDate, endDate, pageIndex, isAuthor, isActiveMember);
             }
 
             case name -> {
-                if (Objects.nonNull(startDate)) {
-                    if (isAuthor) return getArtistMembersByDateAndName(searchString, startDate, endDate, pageIndex, isActiveMember);
-                    else return getMembersByDateAndName(searchString, startDate, endDate, pageIndex, isActiveMember);
-                } else {
-                    if (isAuthor) return getArtistMembersByName(searchString, pageIndex, isActiveMember);
-                    else return entityToResponse(memberMapper.getMembersByName(searchString, pageIndex[0], pageIndex[1], isActiveMember));
-                }
+                return handleNameFilter(searchString, startDate, endDate, pageIndex, isAuthor, isActiveMember);
             }
 
             default -> {
@@ -143,54 +126,84 @@ public class MemberServiceImpl implements MemberService{
         }
     }
 
-    @Transactional
-    public List<Members> getArtistMembers(int[] pageIndex, boolean isActiveMember){
+    @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.READ_COMMITTED)
+    public List<?> handleAllFilter(Date startDate, Date endDate, int[] pageIndex,
+                                    boolean isAuthor, boolean isActiveMember) {
+        if (Objects.nonNull(startDate)) {
+            return isAuthor ? getArtistMembersByDate(startDate, endDate, pageIndex, isActiveMember) :
+                    getMembersByDate(startDate, endDate, pageIndex, isActiveMember);
+        } else {
+            return isAuthor ? getArtistMembers(pageIndex, isActiveMember) :
+                    entityToResponse(memberMapper.getAllMembers(pageIndex[0], pageIndex[1], isActiveMember));
+        }
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.READ_COMMITTED)
+    public List<?> handleEmailFilter(String searchString, Date startDate, Date endDate,
+                                           int[] pageIndex, boolean isAuthor, boolean isActiveMember) {
+        if (Objects.nonNull(startDate)) {
+            return isAuthor ? getArtistMembersByDateAndEmail(searchString, startDate, endDate, pageIndex, isActiveMember) :
+                    getMembersByDateAndEmail(searchString, startDate, endDate, pageIndex, isActiveMember);
+        } else {
+            return isAuthor ? getArtistMembersByEmail(searchString, pageIndex, isActiveMember) :
+                    entityToResponse(memberMapper.getMembersByEmail(searchString, pageIndex[0], pageIndex[1], isActiveMember));
+        }
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.READ_COMMITTED)
+    public List<?> handleNameFilter(String searchString, Date startDate, Date endDate,
+                                          int[] pageIndex, boolean isAuthor, boolean isActiveMember) {
+        if (Objects.nonNull(startDate)) {
+            return isAuthor ? getArtistMembersByDateAndName(searchString, startDate, endDate, pageIndex, isActiveMember) :
+                    getMembersByDateAndName(searchString, startDate, endDate, pageIndex, isActiveMember);
+        } else {
+            return isAuthor ? getArtistMembersByName(searchString, pageIndex, isActiveMember) :
+                    entityToResponse(memberMapper.getMembersByName(searchString, pageIndex[0], pageIndex[1], isActiveMember));
+        }
+    }
+
+    private List<Members> getArtistMembers(int[] pageIndex, boolean isActiveMember){
         return entityToResponse(memberMapper.getArtisMember(pageIndex[0], pageIndex[1], isActiveMember));
     }
 
-    @Transactional
-    public List<Members> getArtistMembersByEmail(String searchString, int[] pageIndex, boolean isActiveMember){
+    private List<Members> getArtistMembersByEmail(String searchString, int[] pageIndex, boolean isActiveMember){
         return entityToResponse(memberMapper.getArtistMembersByEmail(searchString, pageIndex[0], pageIndex[1], isActiveMember));
     }
 
-    @Transactional
-    public List<Members> getArtistMembersByName(String searchString, int[] pageIndex, boolean isActiveMember){
+    private List<Members> getArtistMembersByName(String searchString, int[] pageIndex, boolean isActiveMember){
         return entityToResponse(memberMapper.getArtistMembersByName(searchString, pageIndex[0], pageIndex[1], isActiveMember));
     }
 
-    @Transactional
-    public List<Members> getMembersByDate(Date startDate, Date endDate, int[] pageIndex, boolean isActiveMember) {
+
+    private List<Members> getMembersByDate(Date startDate, Date endDate, int[] pageIndex, boolean isActiveMember) {
         return entityToResponse(memberMapper.getMembersByDate(startDate, endDate, pageIndex[0], pageIndex[1], isActiveMember));
     }
 
-    @Transactional
-    public List<Members> getMembersByDateAndEmail(String searchString, Date startDate, Date endDate, int[] pageIndex, boolean isActiveMember) {
+
+    private List<Members> getMembersByDateAndEmail(String searchString, Date startDate, Date endDate, int[] pageIndex, boolean isActiveMember) {
         return entityToResponse(memberMapper.getMembersByDateAndEmail(searchString, startDate, endDate, pageIndex[0], pageIndex[1], isActiveMember));
     }
 
-    @Transactional
-    public List<Members> getMembersByDateAndName(String searchString, Date startDate, Date endDate, int[] pageIndex, boolean isActiveMember) {
+    private List<Members> getMembersByDateAndName(String searchString, Date startDate, Date endDate, int[] pageIndex, boolean isActiveMember) {
         return entityToResponse(memberMapper.getMembersByDateAndName(searchString, startDate, endDate, pageIndex[0], pageIndex[1], isActiveMember));
     }
 
-    @Transactional
-    public List<Members> getArtistMembersByDate(Date startDate, Date endDate, int[] pageIndex, boolean isActiveMember) {
+
+    private List<Members> getArtistMembersByDate(Date startDate, Date endDate, int[] pageIndex, boolean isActiveMember) {
         return entityToResponse(memberMapper.getArtistMembersByDate(startDate, endDate, pageIndex[0], pageIndex[1], isActiveMember));
     }
 
-    @Transactional
-    public List<Members> getArtistMembersByDateAndEmail(String searchString, Date startDate, Date endDate, int[] pageIndex, boolean isActiveMember) {
+
+    private List<Members> getArtistMembersByDateAndEmail(String searchString, Date startDate, Date endDate, int[] pageIndex, boolean isActiveMember) {
          return entityToResponse(memberMapper.getArtistMembersByDateAndEmail(searchString, startDate, endDate, pageIndex[0], pageIndex[1], isActiveMember));
     }
 
-    @Transactional
-    public List<Members> getArtistMembersByDateAndName(String searchString, Date startDate, Date endDate, int[] pageIndex, boolean isActiveMember) {
+    private List<Members> getArtistMembersByDateAndName(String searchString, Date startDate, Date endDate, int[] pageIndex, boolean isActiveMember) {
          return entityToResponse(memberMapper.getArtistMembersByDateAndName(searchString, startDate, endDate, pageIndex[0], pageIndex[1], isActiveMember));
     }
 
     //TODO : 비동기 동작하도록 구현 필요
-    @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    public List<Members> entityToResponse(List<Member> members){
+    private List<Members> entityToResponse(List<Member> members){
         List<Members> memberList = new ArrayList<>(members.size());
         members.forEach(member -> memberList.add(
                             Members.builder()

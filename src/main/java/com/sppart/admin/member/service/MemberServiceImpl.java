@@ -34,7 +34,7 @@ public class MemberServiceImpl implements MemberService{
                                          FilterType filterType,
                                          int page) {
         //Get Member Info
-        List<Members> members =
+        List<?> members =
                 getMemberListByFilter(filterType, searchString, page, startDate, endDate, isAuthor, true);
 
         return ResponseMembers.builder()
@@ -55,7 +55,7 @@ public class MemberServiceImpl implements MemberService{
                                               FilterType filterType,
                                               int page) {
         //Get Member Info
-        List<Members> members =
+        List<?> members =
                 getMemberListByFilter(filterType, searchString, page, startDate, endDate, isAuthor, false);
 
         return ResponseMembers.builder()

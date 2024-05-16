@@ -1,39 +1,30 @@
 package com.sppart.admin.member.service;
 
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.sppart.admin.exception.CommonErrorCode;
 import com.sppart.admin.member.domain.entity.Member;
 import com.sppart.admin.member.domain.mapper.MemberMapper;
 import com.sppart.admin.member.dto.Members;
 import com.sppart.admin.member.dto.ResponseMemberDetail;
 import com.sppart.admin.member.dto.ResponseMembers;
 import com.sppart.admin.member.dto.UpdateUserInfo;
+import com.sppart.admin.objectstorage.service.ObjectStorageService;
 import com.sppart.admin.utils.FilterType;
+import com.sppart.admin.utils.Page;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.*;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService{
-    @Value("${naver.objectStorage.bucketName}")
-    private String bucketName;
-
     private final MemberMapper memberMapper;
-    private final AmazonS3 awsS3Client;
+    private final ObjectStorageService objectStorageService;
 
     @Override
     @Transactional
@@ -43,7 +34,7 @@ public class MemberServiceImpl implements MemberService{
                                          FilterType filterType,
                                          int page) {
         //Get Member Info
-        List<Members> members =
+        List<?> members =
                 getMemberListByFilter(filterType, searchString, page, startDate, endDate, isAuthor, true);
 
         return ResponseMembers.builder()
@@ -64,7 +55,7 @@ public class MemberServiceImpl implements MemberService{
                                               FilterType filterType,
                                               int page) {
         //Get Member Info
-        List<Members> members =
+        List<?> members =
                 getMemberListByFilter(filterType, searchString, page, startDate, endDate, isAuthor, false);
 
         return ResponseMembers.builder()
@@ -89,7 +80,7 @@ public class MemberServiceImpl implements MemberService{
         }
 
         if (Objects.nonNull(userInfo.getImage())) {
-            String profileName = uploadProfileToStorage(userInfo.getImage());
+            String profileName = objectStorageService.uploadFile(userInfo.getImage());
             memberMapper.updateUserProfileByEmail(userEmail, profileName);
         }
 
@@ -107,43 +98,25 @@ public class MemberServiceImpl implements MemberService{
         return memberMapper.isDuplicateName(name);
     }
 
-    @Transactional
-    public List<Members> getMemberListByFilter(FilterType filterType,
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public List<?> getMemberListByFilter(FilterType filterType,
                                           String searchString,
                                           int page,
                                           Date startDate, Date endDate,
                                           boolean isAuthor, boolean isActiveMember){
-        int[] pageIndex = getPageIndex(page);
+        int[] pageIndex = Page.getPageIndex(page);
 
         switch (filterType){
             case all -> {
-                if (Objects.nonNull(startDate)) {
-                    if (isAuthor) return getArtistMembersByDate(startDate, endDate, pageIndex, isActiveMember);
-                    else return getMembersByDate(startDate, endDate, pageIndex, isActiveMember);
-                } else {
-                    if (isAuthor) return getArtistMembers(pageIndex, isActiveMember);
-                    else return entityToResponse(memberMapper.getAllMembers(pageIndex[0], pageIndex[1], isActiveMember));
-                }
+                return handleAllFilter(startDate, endDate, pageIndex, isAuthor, isActiveMember);
             }
 
             case email -> {
-                if (Objects.nonNull(startDate)) {
-                    if (isAuthor) return getArtistMembersByDateAndEmail(searchString, startDate, endDate, pageIndex, isActiveMember);
-                    else return getMembersByDateAndEmail(searchString, startDate, endDate, pageIndex, isActiveMember);
-                } else {
-                    if (isAuthor) return getArtistMembersByEmail(searchString, pageIndex, isActiveMember);
-                    else return entityToResponse(memberMapper.getMembersByEmail(searchString, pageIndex[0], pageIndex[1], isActiveMember));
-                }
+                return handleEmailFilter(searchString, startDate, endDate, pageIndex, isAuthor, isActiveMember);
             }
 
             case name -> {
-                if (Objects.nonNull(startDate)) {
-                    if (isAuthor) return getArtistMembersByDateAndName(searchString, startDate, endDate, pageIndex, isActiveMember);
-                    else return getMembersByDateAndName(searchString, startDate, endDate, pageIndex, isActiveMember);
-                } else {
-                    if (isAuthor) return getArtistMembersByName(searchString, pageIndex, isActiveMember);
-                    else return entityToResponse(memberMapper.getMembersByName(searchString, pageIndex[0], pageIndex[1], isActiveMember));
-                }
+                return handleNameFilter(searchString, startDate, endDate, pageIndex, isAuthor, isActiveMember);
             }
 
             default -> {
@@ -153,44 +126,84 @@ public class MemberServiceImpl implements MemberService{
         }
     }
 
-    public List<Members> getArtistMembers(int[] pageIndex, boolean isActiveMember){
+    @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.READ_COMMITTED)
+    public List<?> handleAllFilter(Date startDate, Date endDate, int[] pageIndex,
+                                    boolean isAuthor, boolean isActiveMember) {
+        if (Objects.nonNull(startDate)) {
+            return isAuthor ? getArtistMembersByDate(startDate, endDate, pageIndex, isActiveMember) :
+                    getMembersByDate(startDate, endDate, pageIndex, isActiveMember);
+        } else {
+            return isAuthor ? getArtistMembers(pageIndex, isActiveMember) :
+                    entityToResponse(memberMapper.getAllMembers(pageIndex[0], pageIndex[1], isActiveMember));
+        }
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.READ_COMMITTED)
+    public List<?> handleEmailFilter(String searchString, Date startDate, Date endDate,
+                                           int[] pageIndex, boolean isAuthor, boolean isActiveMember) {
+        if (Objects.nonNull(startDate)) {
+            return isAuthor ? getArtistMembersByDateAndEmail(searchString, startDate, endDate, pageIndex, isActiveMember) :
+                    getMembersByDateAndEmail(searchString, startDate, endDate, pageIndex, isActiveMember);
+        } else {
+            return isAuthor ? getArtistMembersByEmail(searchString, pageIndex, isActiveMember) :
+                    entityToResponse(memberMapper.getMembersByEmail(searchString, pageIndex[0], pageIndex[1], isActiveMember));
+        }
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.READ_COMMITTED)
+    public List<?> handleNameFilter(String searchString, Date startDate, Date endDate,
+                                          int[] pageIndex, boolean isAuthor, boolean isActiveMember) {
+        if (Objects.nonNull(startDate)) {
+            return isAuthor ? getArtistMembersByDateAndName(searchString, startDate, endDate, pageIndex, isActiveMember) :
+                    getMembersByDateAndName(searchString, startDate, endDate, pageIndex, isActiveMember);
+        } else {
+            return isAuthor ? getArtistMembersByName(searchString, pageIndex, isActiveMember) :
+                    entityToResponse(memberMapper.getMembersByName(searchString, pageIndex[0], pageIndex[1], isActiveMember));
+        }
+    }
+
+    private List<Members> getArtistMembers(int[] pageIndex, boolean isActiveMember){
         return entityToResponse(memberMapper.getArtisMember(pageIndex[0], pageIndex[1], isActiveMember));
     }
 
-    public List<Members> getArtistMembersByEmail(String searchString, int[] pageIndex, boolean isActiveMember){
+    private List<Members> getArtistMembersByEmail(String searchString, int[] pageIndex, boolean isActiveMember){
         return entityToResponse(memberMapper.getArtistMembersByEmail(searchString, pageIndex[0], pageIndex[1], isActiveMember));
     }
 
-    public List<Members> getArtistMembersByName(String searchString, int[] pageIndex, boolean isActiveMember){
+    private List<Members> getArtistMembersByName(String searchString, int[] pageIndex, boolean isActiveMember){
         return entityToResponse(memberMapper.getArtistMembersByName(searchString, pageIndex[0], pageIndex[1], isActiveMember));
     }
 
-    public List<Members> getMembersByDate(Date startDate, Date endDate, int[] pageIndex, boolean isActiveMember) {
+
+    private List<Members> getMembersByDate(Date startDate, Date endDate, int[] pageIndex, boolean isActiveMember) {
         return entityToResponse(memberMapper.getMembersByDate(startDate, endDate, pageIndex[0], pageIndex[1], isActiveMember));
     }
+
 
     private List<Members> getMembersByDateAndEmail(String searchString, Date startDate, Date endDate, int[] pageIndex, boolean isActiveMember) {
         return entityToResponse(memberMapper.getMembersByDateAndEmail(searchString, startDate, endDate, pageIndex[0], pageIndex[1], isActiveMember));
     }
 
-    public List<Members> getMembersByDateAndName(String searchString, Date startDate, Date endDate, int[] pageIndex, boolean isActiveMember) {
+    private List<Members> getMembersByDateAndName(String searchString, Date startDate, Date endDate, int[] pageIndex, boolean isActiveMember) {
         return entityToResponse(memberMapper.getMembersByDateAndName(searchString, startDate, endDate, pageIndex[0], pageIndex[1], isActiveMember));
     }
 
-    public List<Members> getArtistMembersByDate(Date startDate, Date endDate, int[] pageIndex, boolean isActiveMember) {
+
+    private List<Members> getArtistMembersByDate(Date startDate, Date endDate, int[] pageIndex, boolean isActiveMember) {
         return entityToResponse(memberMapper.getArtistMembersByDate(startDate, endDate, pageIndex[0], pageIndex[1], isActiveMember));
     }
 
-    public List<Members> getArtistMembersByDateAndEmail(String searchString, Date startDate, Date endDate, int[] pageIndex, boolean isActiveMember) {
+
+    private List<Members> getArtistMembersByDateAndEmail(String searchString, Date startDate, Date endDate, int[] pageIndex, boolean isActiveMember) {
          return entityToResponse(memberMapper.getArtistMembersByDateAndEmail(searchString, startDate, endDate, pageIndex[0], pageIndex[1], isActiveMember));
     }
 
-    public List<Members> getArtistMembersByDateAndName(String searchString, Date startDate, Date endDate, int[] pageIndex, boolean isActiveMember) {
+    private List<Members> getArtistMembersByDateAndName(String searchString, Date startDate, Date endDate, int[] pageIndex, boolean isActiveMember) {
          return entityToResponse(memberMapper.getArtistMembersByDateAndName(searchString, startDate, endDate, pageIndex[0], pageIndex[1], isActiveMember));
     }
 
     //TODO : 비동기 동작하도록 구현 필요
-    public List<Members> entityToResponse(List<Member> members){
+    private List<Members> entityToResponse(List<Member> members){
         List<Members> memberList = new ArrayList<>(members.size());
         members.forEach(member -> memberList.add(
                             Members.builder()
@@ -201,42 +214,5 @@ public class MemberServiceImpl implements MemberService{
                             .createAt(member.getCreateAt())
                             .updateAt(member.getNicknameUpdateAt()).build()));
         return memberList;
-    }
-
-    @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    public String uploadProfileToStorage(MultipartFile file) {
-        if(file.isEmpty()) {
-            return null;
-        } else {
-            String fileName = file.getOriginalFilename();
-            String extension = fileName != null ? fileName.substring(fileName.lastIndexOf(".")) : null;
-            String profile = setFileName(extension);
-
-            try {
-                byte[] fileData = file.getBytes();
-                ObjectMetadata data = new ObjectMetadata();
-                data.setContentLength(fileData.length);
-                data.setContentDisposition("inline; filename=" + profile);
-
-                awsS3Client.putObject(new PutObjectRequest(
-                        bucketName, profile,
-                        new ByteArrayInputStream(fileData), data)
-                        .withCannedAcl(CannedAccessControlList.PublicRead));
-                return profile;
-            } catch (IOException e) {
-                throw new RuntimeException(CommonErrorCode.INTERNAL_SERVER_ERROR.getMessage());
-            }
-        }
-    }
-
-    private String setFileName(String extension){
-        if (extension == null) return UUID.randomUUID().toString();
-        return UUID.randomUUID() + extension;
-    }
-
-    private int[] getPageIndex(int page) {
-        int start = (page-1) * 10;
-        int end = page * 10;
-        return new int[]{start, end};
     }
 }

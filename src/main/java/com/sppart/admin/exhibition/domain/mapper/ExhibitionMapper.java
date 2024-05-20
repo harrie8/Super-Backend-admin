@@ -4,6 +4,7 @@ import com.sppart.admin.exhibition.domain.entity.Exhibition;
 import com.sppart.admin.exhibition.dto.ExhibitionByCondition;
 import com.sppart.admin.exhibition.dto.ExhibitionSearchCondition;
 import com.sppart.admin.exhibition.dto.ExhibitionWithParticipatedProducts;
+import com.sppart.admin.exhibition.dto.request.RequestUpdateExhibition;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -17,6 +18,8 @@ public interface ExhibitionMapper {
 
     int countAll();
 
+    List<Exhibition> findByIds(@Param("ids") Set<Long> ids);
+
     int bulkDeleteByIds(@Param("ids") Set<Long> ids);
 
     Optional<Exhibition> findById(@Param("exhibitionId") Long exhibitionId);
@@ -27,4 +30,7 @@ public interface ExhibitionMapper {
             @Param("exhibitionId") Long exhibitionId);
 
     void save(Exhibition exhibition);
+
+    void update(@Param("exhibitionId") Long exhibitionId, @Param("poster") String poster,
+                @Param("req") RequestUpdateExhibition req);
 }

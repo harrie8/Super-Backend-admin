@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum ExhibitionStatus {
     current("전시중"),
+    upcoming("전시 예정"),
     end("전시 종료");
 
     private final String value;

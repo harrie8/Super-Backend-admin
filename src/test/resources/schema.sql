@@ -1,10 +1,3 @@
-DROP TABLE IF EXISTS exhibition;
-DROP TABLE IF EXISTS artist;
-DROP TABLE IF EXISTS product;
-DROP TABLE IF EXISTS product_with_tag;
-DROP TABLE IF EXISTS tag;
-DROP TABLE IF EXISTS product_exhibition;
-
 CREATE TABLE exhibition
 (
     exhibition_id int          NOT NULL AUTO_INCREMENT,
@@ -35,7 +28,7 @@ CREATE TABLE artist
 
 CREATE TABLE product
 (
-    product_id    int NOT NULL,
+    product_id    int NOT NULL auto_increment,
     picture       varchar(50)   DEFAULT NULL,
     title         varchar(50)   DEFAULT NULL,
     artist_name   varchar(50)   DEFAULT NULL,
@@ -67,4 +60,13 @@ CREATE TABLE product_exhibition
     exhibition_id int NOT NULL,
     created_at datetime not null default CURRENT_TIMESTAMP,
     updated_at datetime not null default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+create table `picture_info`
+(
+    product_id int not null
+        primary key,
+    `type`       varchar(100) null,
+    `size`       varchar(100) null,
+    `year`       int null
 );

@@ -12,6 +12,7 @@ import com.sppart.admin.exhibition.dto.ResponseBulkDeleteByIds;
 import com.sppart.admin.exhibition.dto.ResponseExhibitionByCondition;
 import com.sppart.admin.exhibition.dto.ResponseGetExhibitionsByCondition;
 import com.sppart.admin.exhibition.dto.request.RequestCreateExhibition;
+import com.sppart.admin.exhibition.dto.request.RequestUpdateExhibition;
 import com.sppart.admin.exhibition.exception.ExhibitionErrorCode;
 import com.sppart.admin.objectstorage.service.ObjectStorageService;
 import com.sppart.admin.product.dto.ProductOnlyArtistNameDto;
@@ -32,7 +33,6 @@ public class ExhibitionServiceImpl implements ExhibitionService {
     private final ProductExhibitionMapper productExhibitionMapper;
     private final ObjectStorageService objectStorageService;
 
-    // todo 성능 체크 해보기 -> join vs domain 별로 db 접근
     @Override
     @Transactional(readOnly = true)
     public ResponseGetExhibitionsByCondition getExhibitionsByCondition(ExhibitionSearchCondition condition) {
@@ -78,6 +78,10 @@ public class ExhibitionServiceImpl implements ExhibitionService {
         if (ids == null || ids.isEmpty()) {
             return ResponseBulkDeleteByIds.zero();
         }
+
+        List<Exhibition> findExhibitions = exhibitionMapper.findByIds(ids);
+        deletePosters(findExhibitions);
+
         int productExhibitionDeleteCount = productExhibitionMapper.bulkDeleteByExhibitionIds(ids);
         int exhibitionDeleteCount = exhibitionMapper.bulkDeleteByIds(ids);
         return ResponseBulkDeleteByIds.builder()
@@ -86,12 +90,21 @@ public class ExhibitionServiceImpl implements ExhibitionService {
                 .build();
     }
 
+    private void deletePosters(List<Exhibition> findExhibitions) {
+        if (findExhibitions.isEmpty()) {
+            return;
+        }
+        List<String> posterUrls = findExhibitions.stream()
+                .map(Exhibition::getPoster)
+                .toList();
+        objectStorageService.delete(posterUrls);
+    }
+
     @Override
     @Transactional
     public void updateOnlyDisplay(Long exhibitionId, RequestUpdateExhibitionDisplay req) {
-        Exhibition findExhibition = exhibitionMapper.findById(exhibitionId)
+        exhibitionMapper.findById(exhibitionId)
                 .orElseThrow(() -> new SuperpositionAdminException(ExhibitionErrorCode.NOT_FOUND));
-        findExhibition.changeDisplay(req.getIsDisplay());
         exhibitionMapper.updateOnlyDisplay(exhibitionId, req.getIsDisplay());
     }
 
@@ -124,5 +137,23 @@ public class ExhibitionServiceImpl implements ExhibitionService {
         productExhibitionMapper.bulkInsertByExhibitionId(exhibition.getId(), req.getProductIds());
 
         return exhibition.getId();
+    }
+
+    @Override
+    public void update(Long exhibitionId, RequestUpdateExhibition req, MultipartFile poster) {
+        String posterURL = getPosterURL(req, poster);
+
+        exhibitionMapper.update(exhibitionId, posterURL, req);
+
+        productExhibitionMapper.deleteByExhibitionId(exhibitionId);
+        productExhibitionMapper.bulkInsertByExhibitionId(exhibitionId, req.getProductIds());
+    }
+
+    private String getPosterURL(RequestUpdateExhibition req, MultipartFile poster) {
+        if (poster != null && !poster.isEmpty()) {
+            objectStorageService.delete(req.getOldPoster());
+            return objectStorageService.uploadFile(poster);
+        }
+        return req.getOldPoster();
     }
 }

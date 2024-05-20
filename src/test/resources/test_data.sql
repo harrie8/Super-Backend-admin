@@ -134,7 +134,7 @@ VALUES ('여기는 따뜻해',
         'MET',
         '2023-12-16',
         '2024-03-03',
-        'current',
+        'upcoming',
         'women.jpg',
         1);
 
@@ -818,4 +818,66 @@ VALUES (1, 1),
        (20, 1),
        (1, 2),
        (1, 3),
-       (13, 4);
+       (13, 4),
+       (1, 14),
+       (1, 15);
+
+
+INSERT INTO picture_info (product_id, type, size, `year`)
+VALUES (1, '고급켄트지에 디지털프린팅', '83X59cm (A1)', 2023);
+INSERT INTO picture_info (product_id, type, size, `year`)
+VALUES (2, '고급켄트지에 디지털프린팅', '59X83cm (A1)', 2023);
+INSERT INTO picture_info (product_id, type, size, `year`)
+VALUES (3, '고급켄트지에 디지털프린팅', '42X30cm (A3)', 2020);
+INSERT INTO picture_info (product_id, type, size, `year`)
+VALUES (4, '고급켄트지에 디지털프린팅', '42X30cm (A3)', 2020);
+INSERT INTO picture_info (product_id, type, size, `year`)
+VALUES (5, '고급켄트지에 디지털프린팅', '42X30cm (A3)', 2020);
+INSERT INTO picture_info (product_id, type, size, `year`)
+VALUES (6, '고급켄트지에 디지털프린팅', '52X44cm (A2)', 2023);
+INSERT INTO picture_info (product_id, type, size, `year`)
+VALUES (7, '고급켄트지에 디지털프린팅', '42X30cm (A3)', 2021);
+INSERT INTO picture_info (product_id, type, size, `year`)
+VALUES (8, '고급켄트지에 디지털프린팅', '42X30cm (A3)', 2022);
+INSERT INTO picture_info (product_id, type, size, `year`)
+VALUES (9, '고급켄트지에 디지털프린팅', '44X52cm (A2)', 2022);
+INSERT INTO picture_info (product_id, type, size, `year`)
+VALUES (10, '고급켄트지에 디지털프린팅', '44X52cm (A2)', 2022);
+INSERT INTO picture_info (product_id, type, size, `year`)
+VALUES (11, '고급켄트지에 디지털프린팅', '44X52cm (A2)', 2023);
+INSERT INTO picture_info (product_id, type, size, `year`)
+VALUES (12, '고급켄트지에 디지털프린팅', '44X52cm (A2)', 2023);
+INSERT INTO picture_info (product_id, type, size, `year`)
+VALUES (13, 'digital drawing', '40cm x 40cm', 2023);
+INSERT INTO picture_info (product_id, type, size, `year`)
+VALUES (14, 'digital drawing', '40cm x 40cm', 2023);
+INSERT INTO picture_info (product_id, type, size, `year`)
+VALUES (15, 'digital drawing', '40cm x 40cm', 2023);
+INSERT INTO picture_info (product_id, type, size, `year`)
+VALUES (16, 'digital drawing', '40cm x 40cm', 2023);
+INSERT INTO picture_info (product_id, type, size, `year`)
+VALUES (17, 'digital drawing', '40cm x 40cm', 2019);
+INSERT INTO picture_info (product_id, type, size, `year`)
+VALUES (18, 'digital drawing', '42cm x 29.7cm', 2023);
+INSERT INTO picture_info (product_id, type, size, `year`)
+VALUES (19, 'digital drawing', '42cm x 29.7cm', 2023);
+INSERT INTO picture_info (product_id, type, size, `year`)
+VALUES (20, 'Oil on canvas (캔버스에 유화)', '100x80.3 cm', 2023);
+INSERT INTO picture_info (product_id, type, size, `year`)
+VALUES (21, 'Acrylic on canvas(캔버스에 아크릴)', '60.6 x 60.6cm', 2022);
+INSERT INTO picture_info (product_id, type, size, `year`)
+VALUES (22, 'Acrylic on canvas(캔버스에 아크릴)', '60.6x72.7cm', 2022);
+INSERT INTO picture_info (product_id, type, size, `year`)
+VALUES (23, 'Acrylic on canvas(캔버스에 아크릴)', '72.7 x 60.6cm', 2023);
+INSERT INTO picture_info (product_id, type, size, `year`)
+VALUES (24, 'Acrylic on canvas(캔버스에 아크릴)', '53 x 65.1cm', 2023);
+INSERT INTO picture_info (product_id, type, size, `year`)
+VALUES (25, 'Acrylic and Modeling paste on canvas(캔버스에 아크릴,모델링페이스트)', '40 x 40 cm', 2023);
+INSERT INTO picture_info (product_id, type, size, `year`)
+VALUES (26, 'Acrylic on canvas(캔버스에 아크릴)', '30x30cm', 2022);
+INSERT INTO picture_info (product_id, type, size, `year`)
+VALUES (27, '장지에 분채,색연필', '116.8 x 91.0cm', 2023);
+INSERT INTO picture_info (product_id, type, size, `year`)
+VALUES (28, '장지에 과슈, 에어브러쉬', '72.7 x 90.9cm', 2023);
+INSERT INTO picture_info (product_id, type, size, `year`)
+VALUES (29, '나무에 과슈, 색연필 , 털실', '59 x 56 cm', 2023);

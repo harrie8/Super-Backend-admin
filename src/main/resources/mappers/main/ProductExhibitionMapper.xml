@@ -42,4 +42,21 @@
         FROM product_exhibition
         WHERE exhibition_id = #{exhibitionId};
     </select>
+
+    <select id="findExhibitionHistoryOfProductByProductId"
+            resultType="com.sppart.admin.productexhibition.dto.ExhibitionHistoryOfProductDto">
+        SELECT exhi.exhibition_id AS exhibitionId,
+               exhi.title         AS exhibitionTitle,
+               exhi.status        AS exhibitionStatus
+        FROM product_exhibition AS pe
+                 INNER JOIN exhibition AS exhi ON exhi.exhibition_id = pe.exhibition_id
+        WHERE pe.product_id = #{productId}
+        ORDER BY exhi.start_date DESC;
+    </select>
+
+    <delete id="deleteByExhibitionId" parameterType="Long">
+        DELETE
+        FROM product_exhibition AS pe
+        WHERE pe.exhibition_id = #{exhibitionId};
+    </delete>
 </mapper>

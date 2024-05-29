@@ -1,16 +1,13 @@
 package com.sppart.admin.member.dto;
 
-import com.sppart.admin.member.domain.entity.DetailMember;
 import com.sppart.admin.member.domain.entity.Member;
 import com.sppart.admin.utils.Gender;
+import java.sql.Timestamp;
+import java.util.Date;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.sql.Timestamp;
-import java.util.Date;
-
 @Getter
-@Builder
 public class ResponseMemberDetail {
     private int num;
     private String email;
@@ -23,6 +20,7 @@ public class ResponseMemberDetail {
     //추후 추가 예정
 //    private AuthorInfo authorInfo;
 
+    @Builder
     public ResponseMemberDetail(Member member) {
         this.num = 1;
         this.email = member.getEmail();

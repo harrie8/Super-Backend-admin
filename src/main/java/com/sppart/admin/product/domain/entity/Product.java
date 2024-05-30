@@ -15,12 +15,11 @@ public class Product {
     private final int price;
     private final int basicView;
     private final int qrView;
-    private final int likeCount;
     private final int orderCount;
 
     @Builder
     public Product(Long product_id, String picture, String title, String artistName, String description, int price,
-                   int basicView, int qrView, int likeCount, int orderCount) {
+                   int basicView, int qrView, int orderCount) {
         this.product_id = product_id;
         this.picture = picture;
         this.title = title;
@@ -29,7 +28,6 @@ public class Product {
         this.price = price;
         this.basicView = basicView;
         this.qrView = qrView;
-        this.likeCount = likeCount;
         this.orderCount = orderCount;
     }
 
@@ -42,7 +40,6 @@ public class Product {
                 .price(req.getPrice())
                 .basicView(0)
                 .qrView(0)
-                .likeCount(0)
                 .orderCount(0)
                 .build();
     }

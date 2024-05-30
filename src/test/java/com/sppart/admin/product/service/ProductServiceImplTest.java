@@ -224,7 +224,6 @@ class ProductServiceImplTest {
             assertEquals(250_000, actual.getPrice());
             assertEquals(21, actual.getBasicView());
             assertEquals(2, actual.getQrView());
-            assertEquals(2, actual.getLikeCount());
             assertEquals(3, actual.getOrderCount());
             assertEquals("고급켄트지에 디지털프린팅", actual.getPictureInfo().getType());
             assertEquals("83X59cm (A1)", actual.getPictureInfo().getSize());
@@ -270,7 +269,6 @@ class ProductServiceImplTest {
             assertEquals(100_000, actual.getPrice());
             assertEquals(7, actual.getBasicView());
             assertEquals(4, actual.getQrView());
-            assertEquals(1, actual.getLikeCount());
             assertEquals(1, actual.getOrderCount());
             assertThat(actual.getTags())
                     .hasSize(3)
@@ -337,7 +335,6 @@ class ProductServiceImplTest {
             assertEquals(req.getDescription(), actual.getDescription());
             assertEquals(0, actual.getBasicView());
             assertEquals(0, actual.getQrView());
-            assertEquals(0, actual.getLikeCount());
             assertEquals(0, actual.getOrderCount());
             assertEquals(req.getPictureInfo().getType(), actual.getPictureInfo().getType());
             assertEquals(req.getPictureInfo().getSize(), actual.getPictureInfo().getSize());
@@ -490,7 +487,6 @@ class ProductServiceImplTest {
             assertEquals(updateReq.getDescription(), actual.getDescription());
             assertEquals(updateReq.getBasicView(), actual.getBasicView());
             assertEquals(updateReq.getQrView(), actual.getQrView());
-            assertEquals(updateReq.getLikeCount(), actual.getLikeCount());
             assertEquals(updateReq.getOrderCount(), actual.getOrderCount());
             assertEquals(updateReq.getPictureInfo().getType(), actual.getPictureInfo().getType());
             assertEquals(updateReq.getPictureInfo().getSize(), actual.getPictureInfo().getSize());
@@ -565,7 +561,6 @@ class ProductServiceImplTest {
             assertEquals(updateReq.getDescription(), actual.getDescription());
             assertEquals(updateReq.getBasicView(), actual.getBasicView());
             assertEquals(updateReq.getQrView(), actual.getQrView());
-            assertEquals(updateReq.getLikeCount(), actual.getLikeCount());
             assertEquals(updateReq.getOrderCount(), actual.getOrderCount());
             assertEquals(updateReq.getPictureInfo().getType(), actual.getPictureInfo().getType());
             assertEquals(updateReq.getPictureInfo().getSize(), actual.getPictureInfo().getSize());

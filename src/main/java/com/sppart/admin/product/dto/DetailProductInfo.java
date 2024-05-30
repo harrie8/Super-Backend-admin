@@ -21,14 +21,13 @@ public class DetailProductInfo {
     private Integer price;
     private Integer basicView;
     private Integer qrView;
-    private Integer likeCount;
     private Integer orderCount;
     private PictureInfo pictureInfo;
     private Set<Tag> tags;
 
     @Builder
     public DetailProductInfo(Long productId, String picture, String title, String artistName, String description,
-                             Integer price, Integer basicView, Integer qrView, Integer likeCount, Integer orderCount,
+                             Integer price, Integer basicView, Integer qrView, Integer orderCount,
                              PictureInfo pictureInfo, Set<Tag> tags) {
 
         this.productId = productId;
@@ -39,7 +38,6 @@ public class DetailProductInfo {
         this.price = price;
         this.basicView = basicView;
         this.qrView = qrView;
-        this.likeCount = likeCount;
         this.orderCount = orderCount;
         this.pictureInfo = pictureInfo;
         this.tags = tags;

@@ -121,16 +121,18 @@
                exhi.location,
                exhi.status,
                exhi.poster,
-               pro.product_id AS product_id,
-               pro.title      AS product_title,
+               pro.product_id    AS product_id,
+               pro.title         AS product_title,
                pro.basic_view,
                pro.qr_view,
-               pro.like_count,
+               count(li.user_id) AS like_count,
                pro.order_count
         FROM exhibition AS exhi
                  LEFT OUTER JOIN product_exhibition AS pe ON pe.exhibition_id = exhi.exhibition_id
                  LEFT OUTER JOIN product AS pro ON pro.product_id = pe.product_id
-        WHERE exhi.exhibition_id = #{exhibitionId};
+                 LEFT OUTER JOIN `like` AS li ON li.product_id = pro.product_id
+        WHERE exhi.exhibition_id = #{exhibitionId}
+        GROUP BY product_id;
     </select>
 
     <insert id="save" parameterType="com.sppart.admin.exhibition.domain.entity.Exhibition" useGeneratedKeys="true"

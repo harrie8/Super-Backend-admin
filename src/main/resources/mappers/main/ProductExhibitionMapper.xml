@@ -56,7 +56,7 @@
 
     <delete id="deleteByExhibitionId" parameterType="Long">
         DELETE
-        FROM product_exhibition AS pe
-        WHERE pe.exhibition_id = #{exhibitionId};
+        FROM product_exhibition
+        WHERE exhibition_id = #{exhibitionId};
     </delete>
 </mapper>

@@ -1,10 +1,10 @@
-package com.sppart.admin.user.controller;
+package com.sppart.admin.sub.user.controller;
 
-import com.sppart.admin.user.dto.CurrentUser;
-import com.sppart.admin.user.dto.LoginDto;
-import com.sppart.admin.user.dto.LoginRequest;
-import com.sppart.admin.user.dto.LoginResponse;
-import com.sppart.admin.user.service.UserService;
+import com.sppart.admin.sub.user.dto.CurrentUser;
+import com.sppart.admin.sub.user.dto.LoginDto;
+import com.sppart.admin.sub.user.dto.LoginRequest;
+import com.sppart.admin.sub.user.dto.LoginResponse;
+import com.sppart.admin.sub.user.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;

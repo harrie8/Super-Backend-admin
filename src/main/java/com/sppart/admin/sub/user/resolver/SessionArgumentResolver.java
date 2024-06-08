@@ -1,7 +1,7 @@
-package com.sppart.admin.user.resolver;
+package com.sppart.admin.sub.user.resolver;
 
 import com.sppart.admin.exception.SuperpositionAdminException;
-import com.sppart.admin.user.dto.CurrentUser;
+import com.sppart.admin.sub.user.dto.CurrentUser;
 import com.sppart.admin.utils.SessionErrorCode;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.Authentication;

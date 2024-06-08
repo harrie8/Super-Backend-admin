@@ -1,6 +1,6 @@
-package com.sppart.admin.user.dto;
+package com.sppart.admin.sub.user.dto;
 
-import com.sppart.admin.user.domain.Users;
+import com.sppart.admin.sub.user.domain.Users;
 import lombok.Builder;
 import lombok.Getter;
 

@@ -1,4 +1,4 @@
-package com.sppart.admin.user.domain;
+package com.sppart.admin.sub.user.domain;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.ArrayList;

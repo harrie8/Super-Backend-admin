@@ -1,4 +1,4 @@
-package com.sppart.admin.user.dto;
+package com.sppart.admin.sub.user.dto;
 
 import javax.servlet.http.HttpServletRequest;
 import lombok.Builder;

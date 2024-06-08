@@ -1,4 +1,4 @@
-package com.sppart.admin.user.exception;
+package com.sppart.admin.sub.user.exception;
 
 import com.sppart.admin.exception.ErrorCode;
 import lombok.Getter;

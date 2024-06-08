@@ -1,6 +1,6 @@
-package com.sppart.admin.user.domain.mapper;
+package com.sppart.admin.sub.user.domain.mapper;
 
-import com.sppart.admin.user.domain.Users;
+import com.sppart.admin.sub.user.domain.Users;
 import java.util.Optional;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;

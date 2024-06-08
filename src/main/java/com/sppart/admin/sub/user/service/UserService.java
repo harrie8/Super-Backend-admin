@@ -1,7 +1,7 @@
-package com.sppart.admin.user.service;
+package com.sppart.admin.sub.user.service;
 
-import com.sppart.admin.user.dto.LoginDto;
-import com.sppart.admin.user.dto.LoginResponse;
+import com.sppart.admin.sub.user.dto.LoginDto;
+import com.sppart.admin.sub.user.dto.LoginResponse;
 import javax.servlet.http.HttpServletRequest;
 
 public interface UserService {

@@ -1,4 +1,4 @@
-package com.sppart.admin.user.dto;
+package com.sppart.admin.sub.user.dto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

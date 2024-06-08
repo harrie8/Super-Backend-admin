@@ -15,20 +15,11 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 
-
+/*
+전시, 작가 등 주요 DB 연결 설정
+ */
 @Configuration
-// domain 패키지를 이동했는데 spring devtools 예외가 발생해 이런 식으로 작성하게 됐습니다.
-@MapperScan(value = {
-        "com.sppart.admin.artist.domain.mapper",
-        "com.sppart.admin.exhibition.domain.mapper",
-        "com.sppart.admin.like.mapper",
-        "com.sppart.admin.member.domain.mapper",
-        "com.sppart.admin.pictureinfo.domain.mapper",
-        "com.sppart.admin.product.domain.mapper",
-        "com.sppart.admin.productexhibition.mapper",
-        "com.sppart.admin.productwithtag.domain.mapper",
-        "com.sppart.admin.tag.domain.mapper",
-})
+@MapperScan(value = {"com.sppart.admin.main.*.domain.mapper"})
 public class MainDataSourceConfig {
 
     private final String MAIN_DATA_SOURCE = "MainDataSource";

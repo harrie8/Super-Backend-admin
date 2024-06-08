@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.sppart.admin.productexhibition.mapper.ProductExhibitionMapper">
+<mapper namespace="com.sppart.admin.main.productexhibition.domain.mapper.ProductExhibitionMapper">
 
     <delete id="bulkDeleteByExhibitionIds">
         <if test="exhibitionIds != null and !exhibitionIds.isEmpty()">
@@ -30,7 +30,7 @@
         </if>
     </insert>
 
-    <resultMap id="productExhibitionDto" type="com.sppart.admin.productexhibition.dto.ProductExhibitionDto">
+    <resultMap id="productExhibitionDto" type="com.sppart.admin.main.productexhibition.dto.ProductExhibitionDto">
         <result column="product_id" property="productId"/>
         <result column="exhibition_id" property="exhibitionId"/>
         <result column="created_at" property="createdAt"/>
@@ -44,7 +44,7 @@
     </select>
 
     <select id="findExhibitionHistoryOfProductByProductId"
-            resultType="com.sppart.admin.productexhibition.dto.ExhibitionHistoryOfProductDto">
+            resultType="com.sppart.admin.main.productexhibition.dto.ExhibitionHistoryOfProductDto">
         SELECT exhi.exhibition_id AS exhibitionId,
                exhi.title         AS exhibitionTitle,
                exhi.status        AS exhibitionStatus

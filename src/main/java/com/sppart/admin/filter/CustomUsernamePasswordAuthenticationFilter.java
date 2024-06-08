@@ -1,4 +1,4 @@
-package com.sppart.admin.sub.user.filter;
+package com.sppart.admin.filter;
 
 import com.sppart.admin.sub.user.domain.Accessor;
 import com.sppart.admin.utils.SessionConst;

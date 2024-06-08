@@ -1,7 +1,7 @@
 package com.sppart.admin.config;
 
-import com.sppart.admin.sub.user.resolver.PageableVerificationArgumentResolver;
-import com.sppart.admin.sub.user.resolver.SessionArgumentResolver;
+import com.sppart.admin.resolver.PageableVerificationArgumentResolver;
+import com.sppart.admin.resolver.SessionArgumentResolver;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

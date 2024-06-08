@@ -1,4 +1,4 @@
-package com.sppart.admin.sub.user.resolver;
+package com.sppart.admin.resolver;
 
 import com.sppart.admin.exception.SuperpositionAdminException;
 import com.sppart.admin.sub.user.dto.CurrentUser;

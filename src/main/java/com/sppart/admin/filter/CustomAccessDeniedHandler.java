@@ -1,4 +1,4 @@
-package com.sppart.admin.sub.user.filter;
+package com.sppart.admin.filter;
 
 import java.io.IOException;
 import javax.servlet.ServletException;

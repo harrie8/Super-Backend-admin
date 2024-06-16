@@ -105,6 +105,7 @@
         <collection property="products" ofType="com.sppart.admin.main.product.dto.ProductForSpecificExhibition">
             <id column="product_id" property="productId"/>
             <result column="product_title" property="title"/>
+            <result column="product_picture" property="picture"/>
             <result column="basic_view" property="basicView"/>
             <result column="qr_view" property="qrView"/>
             <result column="like_count" property="likeCount"/>
@@ -123,6 +124,7 @@
                exhi.poster,
                pro.product_id    AS product_id,
                pro.title         AS product_title,
+               pro.picture       AS product_picture,
                pro.basic_view,
                pro.qr_view,
                count(li.user_id) AS like_count,

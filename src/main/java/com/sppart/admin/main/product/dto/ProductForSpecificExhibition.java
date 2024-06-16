@@ -8,6 +8,7 @@ import lombok.ToString;
 public class ProductForSpecificExhibition {
     private long productId;
     private String title;
+    private String picture;
     private int basicView;
     private int qrView;
     private int likeCount;

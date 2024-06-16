@@ -67,7 +67,8 @@ public class ExhibitionController {
     })
     @DeleteMapping
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<String> bulkDeleteByIds(@ApiParam(value = "삭제하고 싶은 전시 id들") @RequestParam Set<Long> ids) {
+    public ResponseEntity<String> bulkDeleteByIds(
+            @ApiParam(name = "ids", value = "example: /exhibitions?ids=15,16 -> 전시 ID가 15,16인 전시를 삭제") @RequestParam Set<Long> ids) {
         ResponseBulkDeleteByIds deleteCount = exhibitionService.bulkDeleteByIds(ids);
 
         return ResponseEntity.ok(deleteCount.toString());
@@ -108,9 +109,9 @@ public class ExhibitionController {
     })
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     @ResponseStatus(HttpStatus.CREATED)
-    public void createExhibition(@Valid @RequestPart RequestCreateExhibition req,
+    public void createExhibition(@Valid @RequestPart RequestCreateExhibition requestCreateExhibition,
                                  @ApiParam(value = "포스터 이미지 파일") @RequestPart MultipartFile poster) {
-        exhibitionService.create(req, poster);
+        exhibitionService.create(requestCreateExhibition, poster);
     }
 
     @ApiOperation(value = "전시 수정", notes = "전시의 정보룰 수정하는 API입니다.")
@@ -120,9 +121,9 @@ public class ExhibitionController {
     @PutMapping("/{exhibitionId}")
     @ResponseStatus(HttpStatus.OK)
     public String updateExhibition(@ApiParam(value = "작품 ID") @PathVariable Long exhibitionId,
-                                   @Valid @RequestPart RequestUpdateExhibition req,
+                                   @Valid @RequestPart RequestUpdateExhibition requestUpdateExhibition,
                                    @ApiParam(value = "전시 포스터 파일") @RequestPart(required = false) MultipartFile poster) {
-        exhibitionService.update(exhibitionId, req, poster);
+        exhibitionService.update(exhibitionId, requestUpdateExhibition, poster);
 
         return "exhibition update success";
     }

@@ -65,7 +65,8 @@ public class ProductController {
     })
     @DeleteMapping
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<String> bulkDeleteByIds(@ApiParam(value = "삭제하고 싶은 작품 id들") @RequestParam Set<Long> ids) {
+    public ResponseEntity<String> bulkDeleteByIds(
+            @ApiParam(value = "example: /products?ids=12,13,14 -> 작품 ID가 12,13,14인 작품을 삭제") @RequestParam Set<Long> ids) {
         ResponseBulkDeleteProductByIds deleteCount = productService.bulkDeleteByIds(ids);
 
         return ResponseEntity.ok(deleteCount.toString());
@@ -89,10 +90,10 @@ public class ProductController {
     })
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     @ResponseStatus(HttpStatus.CREATED)
-    public void createProduct(@Valid @RequestPart RequestCreateProduct req,
+    public void createProduct(@Valid @RequestPart RequestCreateProduct requestCreateProduct,
                               @ApiParam(value = "작품 이미지 파일") @RequestPart MultipartFile picture) {
 
-        productService.create(req, picture);
+        productService.create(requestCreateProduct, picture);
     }
 
     @ApiOperation(value = "작품 수정", notes = "작품의 정보룰 수정하는 API입니다.")
@@ -102,9 +103,9 @@ public class ProductController {
     @PutMapping("/{productId}")
     @ResponseStatus(HttpStatus.OK)
     public String updateProduct(@ApiParam(value = "작품 ID") @PathVariable Long productId,
-                                @Valid @RequestPart RequestUpdateProduct req,
+                                @Valid @RequestPart RequestUpdateProduct requestUpdateProduct,
                                 @ApiParam(value = "작품 이미지 파일") @RequestPart(required = false) MultipartFile picture) {
-        productService.update(productId, req, picture);
+        productService.update(productId, requestUpdateProduct, picture);
 
         return "product update success";
     }

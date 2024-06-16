@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.sppart.admin.product.domain.mapper.ProductMapper">
+<mapper namespace="com.sppart.admin.main.product.domain.mapper.ProductMapper">
 
-    <resultMap id="detailProductInfoMap" type="com.sppart.admin.product.dto.DetailProductInfo">
+    <resultMap id="detailProductInfoMap" type="com.sppart.admin.main.product.dto.DetailProductInfo">
         <id column="product_id" property="productId"/>
         <result column="picture" property="picture"/>
         <result column="title" property="title"/>
@@ -11,26 +11,25 @@
         <result column="price" property="price"/>
         <result column="basic_view" property="basicView"/>
         <result column="qr_view" property="qrView"/>
-        <result column="like_count" property="likeCount"/>
         <result column="order_count" property="orderCount"/>
         <association property="pictureInfo" resultMap="pictureInfoMap"/>
         <collection property="tags" resultMap="tagMap"/>
     </resultMap>
 
-    <resultMap id="pictureInfoMap" type="com.sppart.admin.pictureinfo.domain.entity.PictureInfo">
+    <resultMap id="pictureInfoMap" type="com.sppart.admin.main.pictureinfo.domain.entity.PictureInfo">
         <id property="product_id" column="product_id"/>
         <result column="type" property="type"/>
         <result column="size" property="size"/>
         <result column="year" property="year"/>
     </resultMap>
 
-    <resultMap id="tagMap" type="com.sppart.admin.tag.domain.entity.Tag">
+    <resultMap id="tagMap" type="com.sppart.admin.main.tag.domain.entity.Tag">
         <id property="tag_id" column="tagId"/>
         <result property="name" column="tagName"/>
     </resultMap>
 
     <select id="findDetailProductInfosByCondition"
-            parameterType="com.sppart.admin.product.dto.ProductSearchCondition"
+            parameterType="com.sppart.admin.main.product.dto.ProductSearchCondition"
             resultMap="detailProductInfoMap">
         SELECT prod.product_id,
         prod.picture,
@@ -40,7 +39,6 @@
         prod.price,
         prod.basic_view,
         prod.qr_view,
-        prod.like_count,
         prod.order_count,
         pi.type,
         pi.size,
@@ -100,7 +98,6 @@
             prod.basic_view,
             prod.qr_view,
             prod.like_count,
-            prod.order_count,
             pi.type,
             pi.size,
             pi.`year`,
@@ -128,7 +125,6 @@
                prod.price,
                prod.basic_view,
                prod.qr_view,
-               prod.like_count,
                prod.order_count,
                pi.type,
                pi.size,
@@ -142,12 +138,10 @@
         WHERE prod.product_id = #{productId};
     </select>
 
-    <insert id="save" parameterType="com.sppart.admin.product.domain.entity.Product" useGeneratedKeys="true"
+    <insert id="save" parameterType="com.sppart.admin.main.product.domain.entity.Product" useGeneratedKeys="true"
             keyProperty="product_id">
-        INSERT INTO product(picture, title, artist_name, description, price, basic_view, qr_view, like_count,
-                            order_count)
-        VALUES (#{picture}, #{title}, #{artistName}, #{description}, #{price}, #{basicView}, #{qrView}, #{likeCount},
-                #{orderCount});
+        INSERT INTO product(picture, title, artist_name, description, price, basic_view, qr_view, order_count)
+        VALUES (#{picture}, #{title}, #{artistName}, #{description}, #{price}, #{basicView}, #{qrView}, #{orderCount});
     </insert>
 
     <update id="update">
@@ -159,7 +153,6 @@
             price       = #{req.price},
             basic_view  = #{req.basicView},
             qr_view     = #{req.qrView},
-            like_count  = #{req.likeCount},
             order_count = #{req.orderCount}
         WHERE product_id = #{productId};
     </update>

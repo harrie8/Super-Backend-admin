@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.sppart.admin.exhibition.domain.mapper.ExhibitionMapper">
+<mapper namespace="com.sppart.admin.main.exhibition.domain.mapper.ExhibitionMapper">
 
-    <resultMap id="exhibitionByConditionMap" type="com.sppart.admin.exhibition.dto.ExhibitionByCondition">
+    <resultMap id="exhibitionByConditionMap" type="com.sppart.admin.main.exhibition.dto.ExhibitionByCondition">
         <id column="exhibition_id" property="exhibitionId"/>
         <result column="title" property="title"/>
         <result column="subHeading" property="subHeading"/>
@@ -11,14 +11,14 @@
         <result column="end_Date" property="endDate"/>
         <result column="status" property="status"/>
         <result column="is_display" property="isDisplay"/>
-        <collection property="products" ofType="com.sppart.admin.product.dto.ProductOnlyArtistNameDto">
+        <collection property="products" ofType="com.sppart.admin.main.product.dto.ProductOnlyArtistNameDto">
             <id column="product_id" property="productId"/>
             <result column="artist_name" property="artistName"/>
         </collection>
     </resultMap>
 
     <select id="findExhibitionsByCondition"
-            parameterType="com.sppart.admin.exhibition.dto.ResponseExhibitionByCondition"
+            parameterType="com.sppart.admin.main.exhibition.dto.ResponseExhibitionByCondition"
             resultMap="exhibitionByConditionMap">
         SELECT exhi.exhibition_id,
         exhi.title,
@@ -56,7 +56,7 @@
         FROM exhibition;
     </select>
 
-    <select id="findByIds" resultType="com.sppart.admin.exhibition.domain.entity.Exhibition">
+    <select id="findByIds" resultType="com.sppart.admin.main.exhibition.domain.entity.Exhibition">
         SELECT *
         FROM exhibition
         <where>
@@ -80,7 +80,7 @@
         </if>
     </delete>
 
-    <select id="findById" resultType="com.sppart.admin.exhibition.domain.entity.Exhibition">
+    <select id="findById" resultType="com.sppart.admin.main.exhibition.domain.entity.Exhibition">
         SELECT *
         FROM exhibition
         WHERE exhibition_id = #{exhibitionId};
@@ -93,7 +93,7 @@
     </update>
 
     <resultMap id="findByIdWithParticipatedProductsMap"
-               type="com.sppart.admin.exhibition.dto.ExhibitionWithParticipatedProducts">
+               type="com.sppart.admin.main.exhibition.dto.ExhibitionWithParticipatedProducts">
         <id column="exhibition_id" property="exhibitionId"/>
         <result column="title" property="title"/>
         <result column="subHeading" property="subHeading"/>
@@ -102,7 +102,7 @@
         <result column="end_Date" property="endDate"/>
         <result column="status" property="status"/>
         <result column="poster" property="poster"/>
-        <collection property="products" ofType="com.sppart.admin.product.dto.ProductForSpecificExhibition">
+        <collection property="products" ofType="com.sppart.admin.main.product.dto.ProductForSpecificExhibition">
             <id column="product_id" property="productId"/>
             <result column="product_title" property="title"/>
             <result column="basic_view" property="basicView"/>
@@ -121,19 +121,21 @@
                exhi.location,
                exhi.status,
                exhi.poster,
-               pro.product_id AS product_id,
-               pro.title      AS product_title,
+               pro.product_id    AS product_id,
+               pro.title         AS product_title,
                pro.basic_view,
                pro.qr_view,
-               pro.like_count,
+               count(li.user_id) AS like_count,
                pro.order_count
         FROM exhibition AS exhi
                  LEFT OUTER JOIN product_exhibition AS pe ON pe.exhibition_id = exhi.exhibition_id
                  LEFT OUTER JOIN product AS pro ON pro.product_id = pe.product_id
-        WHERE exhi.exhibition_id = #{exhibitionId};
+                 LEFT OUTER JOIN `like` AS li ON li.product_id = pro.product_id
+        WHERE exhi.exhibition_id = #{exhibitionId}
+        GROUP BY product_id;
     </select>
 
-    <insert id="save" parameterType="com.sppart.admin.exhibition.domain.entity.Exhibition" useGeneratedKeys="true"
+    <insert id="save" parameterType="com.sppart.admin.main.exhibition.domain.entity.Exhibition" useGeneratedKeys="true"
             keyProperty="id">
         INSERT INTO exhibition(title, subHeading, start_date, end_date, location, status, poster, is_display)
         VALUES (#{title}, #{subHeading}, #{startDate}, #{endDate}, #{location}, #{status}, #{poster}, #{isDisplay});

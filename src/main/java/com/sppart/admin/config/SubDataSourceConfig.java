@@ -14,8 +14,11 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 
+/*
+admin user DB 연결을 위한 설정
+ */
 @Configuration
-@MapperScan(value = "com.sppart.admin.user.domain.mapper", sqlSessionFactoryRef = "subSqlSessionFactory")
+@MapperScan(value = {"com.sppart.admin.sub.*.domain.mapper"}, sqlSessionFactoryRef = "subSqlSessionFactory")
 public class SubDataSourceConfig {
 
     private final String SUB_DATA_SOURCE = "SubDataSource";
@@ -33,6 +36,7 @@ public class SubDataSourceConfig {
             throws Exception {
         final SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
         sqlSessionFactoryBean.setDataSource(dataSource);
+//        sqlSessionFactoryBean.setTypeAliasesPackage("com.sppart.admin.sub.user.dto.mapper");
 
         Resource[] resources = new PathMatchingResourcePatternResolver().getResources("classpath:mappers/sub/*.xml");
         sqlSessionFactoryBean.setMapperLocations(resources);

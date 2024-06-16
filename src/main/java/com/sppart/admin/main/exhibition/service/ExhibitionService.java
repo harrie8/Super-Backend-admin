@@ -16,7 +16,7 @@ public interface ExhibitionService {
 
     ResponseBulkDeleteByIds bulkDeleteByIds(Set<Long> ids);
 
-    void updateOnlyDisplay(Long exhibitionId, RequestUpdateExhibitionDisplay req);
+    String updateOnlyDisplay(Long exhibitionId, RequestUpdateExhibitionDisplay req);
 
     ExhibitionWithParticipatedProducts getByIdWithParticipatedProducts(Long exhibitionId);
 

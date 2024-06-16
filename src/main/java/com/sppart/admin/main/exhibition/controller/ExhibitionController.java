@@ -83,9 +83,7 @@ public class ExhibitionController {
     @ResponseStatus(HttpStatus.OK)
     public String updateDisplay(@ApiParam(value = "전시 ID") @PathVariable Long exhibitionId,
                                 @Valid @RequestBody RequestUpdateExhibitionDisplay req) {
-        exhibitionService.updateOnlyDisplay(exhibitionId, req);
-
-        return "display update success";
+        return exhibitionService.updateOnlyDisplay(exhibitionId, req);
     }
 
     @ApiOperation(value = "전시 상세 - 전시 상세 조회", notes = "전시 정보와 해당 전시에 포함된 작품들 정보도 조회하는 API입니다.")

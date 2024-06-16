@@ -74,7 +74,7 @@ public class ExhibitionController {
         return ResponseEntity.ok(deleteCount.toString());
     }
 
-    @ApiOperation(value = "전시 목록 - 노출 여부 변경", notes = "전시의 노출 여부를 변경하는 API입니다.")
+    @ApiOperation(value = "전시 목록 - 노출 여부 변경", notes = "전시의 노출 여부를 변경하는 API입니다. isDisplay 요청값은 0(false), 1(true)만 허용하며 그 외의 값 입력 시 예외가 발생합니다.")
     @ApiResponses({
             @ApiResponse(code = 200, message = "전시 노출 여부 변경 성공", response = String.class),
             @ApiResponse(code = 404, message = "존재하지 않는 전시", response = String.class),

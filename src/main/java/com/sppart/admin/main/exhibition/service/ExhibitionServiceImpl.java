@@ -9,14 +9,14 @@ import com.sppart.admin.main.exhibition.dto.ExhibitionSearchCondition;
 import com.sppart.admin.main.exhibition.dto.ExhibitionWithParticipatedProducts;
 import com.sppart.admin.main.exhibition.dto.RequestUpdateExhibitionDisplay;
 import com.sppart.admin.main.exhibition.dto.ResponseBulkDeleteByIds;
-import com.sppart.admin.main.exhibition.dto.ResponseExhibitionByCondition;
-import com.sppart.admin.main.exhibition.dto.ResponseGetExhibitionsByCondition;
 import com.sppart.admin.main.exhibition.dto.request.RequestCreateExhibition;
 import com.sppart.admin.main.exhibition.dto.request.RequestUpdateExhibition;
 import com.sppart.admin.main.exhibition.exception.ExhibitionErrorCode;
 import com.sppart.admin.main.product.dto.ProductOnlyArtistNameDto;
 import com.sppart.admin.main.productexhibition.domain.mapper.ProductExhibitionMapper;
 import com.sppart.admin.objectstorage.service.ObjectStorageService;
+import com.sppart.admin.utils.PageInfo;
+import com.sppart.admin.utils.PageInfo.PageInfoBuilder;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -35,16 +35,24 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 
     @Override
     @Transactional(readOnly = true)
-    public ResponseGetExhibitionsByCondition getExhibitionsByCondition(ExhibitionSearchCondition condition) {
+    public PageInfo<ExhibitionByCondition> getExhibitionsByCondition(ExhibitionSearchCondition condition) {
         int totalExhibitionCount = exhibitionMapper.countAll();
         List<ExhibitionByCondition> findExhibitions = exhibitionMapper.findExhibitionsByCondition(condition);
 
+        PageInfoBuilder<ExhibitionByCondition> exhibitionByConditionPageInfoBuilder = PageInfo.<ExhibitionByCondition>builder()
+                .pageIndex(condition.getPageNumber())
+                .pageSize(condition.getPageSize())
+                .totalCount(totalExhibitionCount);
+
         if (condition.hasArtistName()) {
-            return toResponse(totalExhibitionCount,
-                    findExhibitionsFilteringByConditionArtistName(condition, findExhibitions));
+            return exhibitionByConditionPageInfoBuilder
+                    .data(findExhibitionsFilteringByConditionArtistName(condition, findExhibitions))
+                    .build();
         }
 
-        return toResponse(totalExhibitionCount, findExhibitions);
+        return exhibitionByConditionPageInfoBuilder
+                .data(findExhibitions)
+                .build();
     }
 
     private List<ExhibitionByCondition> findExhibitionsFilteringByConditionArtistName(
@@ -57,19 +65,6 @@ public class ExhibitionServiceImpl implements ExhibitionService {
                             .anyMatch(sameArtistName);
                 })
                 .toList();
-    }
-
-    private ResponseGetExhibitionsByCondition toResponse(int totalCount,
-                                                         List<ExhibitionByCondition> exhibitionByConditions) {
-        List<ResponseExhibitionByCondition> findExhibitions = exhibitionByConditions.stream()
-                .map(ResponseExhibitionByCondition::from)
-                .toList();
-
-        return ResponseGetExhibitionsByCondition.builder()
-                .totalCount(totalCount)
-                .findResultCount(findExhibitions.size())
-                .findExhibitions(findExhibitions)
-                .build();
     }
 
     @Override

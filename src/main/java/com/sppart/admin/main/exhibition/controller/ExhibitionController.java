@@ -1,5 +1,6 @@
 package com.sppart.admin.main.exhibition.controller;
 
+import com.sppart.admin.main.exhibition.dto.ExhibitionByCondition;
 import com.sppart.admin.main.exhibition.dto.ExhibitionSearchCondition;
 import com.sppart.admin.main.exhibition.dto.ExhibitionWithParticipatedProducts;
 import com.sppart.admin.main.exhibition.dto.RequestUpdateExhibitionDisplay;
@@ -10,6 +11,7 @@ import com.sppart.admin.main.exhibition.dto.request.RequestGetExhibitions;
 import com.sppart.admin.main.exhibition.dto.request.RequestUpdateExhibition;
 import com.sppart.admin.main.exhibition.dto.response.ResponseExhibitionWithParticipatedProducts;
 import com.sppart.admin.main.exhibition.service.ExhibitionService;
+import com.sppart.admin.utils.PageInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -18,6 +20,8 @@ import io.swagger.annotations.ApiResponses;
 import java.util.Set;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -50,8 +54,11 @@ public class ExhibitionController {
     })
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public ResponseGetExhibitionsByCondition getExhibitionsByCondition(@ModelAttribute RequestGetExhibitions req) {
+    public PageInfo<ExhibitionByCondition> getExhibitionsByCondition(
+            @PageableDefault(page = 1, size = 10) Pageable pageable,
+            @ModelAttribute RequestGetExhibitions req) {
         ExhibitionSearchCondition condition = ExhibitionSearchCondition.builder()
+                .pageable(pageable)
                 .startDate(req.getStartDate())
                 .endDate(req.getEndDate())
                 .title(req.getTitle())

@@ -1,18 +1,19 @@
 package com.sppart.admin.main.exhibition.service;
 
+import com.sppart.admin.main.exhibition.dto.ExhibitionByCondition;
 import com.sppart.admin.main.exhibition.dto.ExhibitionSearchCondition;
 import com.sppart.admin.main.exhibition.dto.ExhibitionWithParticipatedProducts;
 import com.sppart.admin.main.exhibition.dto.RequestUpdateExhibitionDisplay;
 import com.sppart.admin.main.exhibition.dto.ResponseBulkDeleteByIds;
-import com.sppart.admin.main.exhibition.dto.ResponseGetExhibitionsByCondition;
 import com.sppart.admin.main.exhibition.dto.request.RequestCreateExhibition;
 import com.sppart.admin.main.exhibition.dto.request.RequestUpdateExhibition;
+import com.sppart.admin.utils.PageInfo;
 import java.util.Set;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface ExhibitionService {
 
-    ResponseGetExhibitionsByCondition getExhibitionsByCondition(ExhibitionSearchCondition condition);
+    PageInfo<ExhibitionByCondition> getExhibitionsByCondition(ExhibitionSearchCondition condition);
 
     ResponseBulkDeleteByIds bulkDeleteByIds(Set<Long> ids);
 

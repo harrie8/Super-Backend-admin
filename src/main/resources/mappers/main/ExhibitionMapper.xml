@@ -30,7 +30,7 @@
         exhi.is_display,
         pro.product_id AS product_id,
         pro.artist_name AS artist_name
-        FROM exhibition AS exhi
+        FROM (select * from exhibition order by exhibition_id LIMIT #{condition.offset}, #{condition.pageSize}) as exhi
         LEFT OUTER JOIN product_exhibition AS pe ON pe.exhibition_id = exhi.exhibition_id
         LEFT OUTER JOIN product AS pro ON pro.product_id = pe.product_id
         <where>

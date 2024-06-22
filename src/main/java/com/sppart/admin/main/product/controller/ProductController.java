@@ -1,15 +1,15 @@
 package com.sppart.admin.main.product.controller;
 
 import com.sppart.admin.main.exhibition.dto.ResponseGetExhibitionsByCondition;
+import com.sppart.admin.main.product.dto.DetailProductInfo;
 import com.sppart.admin.main.product.dto.ProductSearchCondition;
 import com.sppart.admin.main.product.dto.request.RequestCreateProduct;
 import com.sppart.admin.main.product.dto.request.RequestGetProducts;
 import com.sppart.admin.main.product.dto.request.RequestUpdateProduct;
 import com.sppart.admin.main.product.dto.response.ResponseBulkDeleteProductByIds;
 import com.sppart.admin.main.product.dto.response.ResponseDetailProductInfo;
-import com.sppart.admin.main.product.dto.response.ResponseGetProductsByCondition;
-import com.sppart.admin.main.product.dto.response.ResponsePaging;
 import com.sppart.admin.main.product.service.ProductService;
+import com.sppart.admin.utils.PageInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -18,6 +18,8 @@ import io.swagger.annotations.ApiResponses;
 import java.util.Set;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -48,9 +50,11 @@ public class ProductController {
     })
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public ResponsePaging<ResponseGetProductsByCondition> getExhibitionsByCondition(
+    public PageInfo<DetailProductInfo> getExhibitionsByCondition(
+            @PageableDefault(page = 1, size = 10) Pageable pageable,
             @ModelAttribute RequestGetProducts req) {
         ProductSearchCondition condition = ProductSearchCondition.builder()
+                .pageable(pageable)
                 .title(req.getTitle())
                 .artistName(req.getArtistName())
                 .productId(req.getProductId())

@@ -13,8 +13,6 @@ import com.sppart.admin.main.product.dto.request.RequestCreateProduct;
 import com.sppart.admin.main.product.dto.request.RequestUpdateProduct;
 import com.sppart.admin.main.product.dto.response.ResponseBulkDeleteProductByIds;
 import com.sppart.admin.main.product.dto.response.ResponseDetailProductInfo;
-import com.sppart.admin.main.product.dto.response.ResponseGetProductsByCondition;
-import com.sppart.admin.main.product.dto.response.ResponsePaging;
 import com.sppart.admin.main.product.exception.ProductErrorCode;
 import com.sppart.admin.main.productexhibition.domain.mapper.ProductExhibitionMapper;
 import com.sppart.admin.main.productexhibition.dto.ExhibitionHistoryOfProductDto;
@@ -22,6 +20,7 @@ import com.sppart.admin.main.productwithtag.domain.mapper.ProductWithTagMapper;
 import com.sppart.admin.main.tag.domain.entity.Tags;
 import com.sppart.admin.main.tag.domain.mapper.TagMapper;
 import com.sppart.admin.objectstorage.service.ObjectStorageService;
+import com.sppart.admin.utils.PageInfo;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -43,24 +42,16 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional(readOnly = true)
-    public ResponsePaging<ResponseGetProductsByCondition> getProductsByCondition(
+    public PageInfo<DetailProductInfo> getProductsByCondition(
             ProductSearchCondition condition) {
         int totalProductCount = productMapper.countAll();
         List<DetailProductInfo> findDetailProductInfos = productMapper.findDetailProductInfosByCondition(condition);
 
-        return toResponse(totalProductCount, findDetailProductInfos);
-    }
-
-    private ResponsePaging<ResponseGetProductsByCondition> toResponse(int totalCount,
-                                                                      List<DetailProductInfo> detailProductInfos) {
-        List<ResponseGetProductsByCondition> responseDetailProductInfos = detailProductInfos.stream()
-                .map(ResponseGetProductsByCondition::of)
-                .toList();
-
-        return ResponsePaging.<ResponseGetProductsByCondition>builder()
-                .totalCount(totalCount)
-                .findResultCount(responseDetailProductInfos.size())
-                .findDomains(responseDetailProductInfos)
+        return PageInfo.<DetailProductInfo>builder()
+                .pageIndex(condition.getPageNumber())
+                .pageSize(condition.getPageSize())
+                .totalCount(totalProductCount)
+                .data(findDetailProductInfos)
                 .build();
     }
 

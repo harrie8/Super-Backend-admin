@@ -54,13 +54,13 @@
         INNER JOIN tag AS t ON t.tag_id = pwt.tag_id
         INNER JOIN picture_info AS pi ON pi.product_id = prod.product_id
         <where>
-            <if test="condition.title != null and condition.title != ''">
+            <if test="@org.springframework.util.StringUtils@hasText(condition.title)">
                 AND UPPER(prod.title) LIKE CONCAT('%', UPPER(#{condition.title}), '%')
             </if>
-            <if test="condition.artistName != null and condition.artistName != ''">
+            <if test="@org.springframework.util.StringUtils@hasText(condition.artistName)">
                 AND UPPER(prod.artist_name) LIKE CONCAT('%', UPPER(#{condition.artistName}), '%')
             </if>
-            <if test="condition.productId != null and !condition.productId.equals('')">
+            <if test="condition.productId != null">
                 AND prod.product_id = #{condition.productId}
             </if>
         </where>

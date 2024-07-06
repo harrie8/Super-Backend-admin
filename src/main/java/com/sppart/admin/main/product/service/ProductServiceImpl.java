@@ -40,16 +40,28 @@ public class ProductServiceImpl implements ProductService {
     private final TagMapper tagMapper;
     private final ProductExhibitionMapper productExhibitionMapper;
 
+    private static final int START_PAGE_INDEX = 1;
+
     @Override
     @Transactional(readOnly = true)
-    public PageInfo<DetailProductInfo> getProductsByCondition(
-            ProductSearchCondition condition) {
+    public PageInfo<DetailProductInfo> getProductsByCondition(ProductSearchCondition condition) {
         int totalProductCount = productMapper.countAll();
         List<DetailProductInfo> findDetailProductInfos = productMapper.findDetailProductInfosByCondition(condition);
 
+        // 전체 데이터 반환
+        if (condition.isNotValidPaging()) {
+            return PageInfo.<DetailProductInfo>builder()
+                    .pageIndex(START_PAGE_INDEX)
+                    .pageSize(totalProductCount)
+                    .totalCount(totalProductCount)
+                    .data(findDetailProductInfos)
+                    .build();
+        }
+
+        // 페이징 데이터 반환
         return PageInfo.<DetailProductInfo>builder()
-                .pageIndex(condition.getPageNumber())
-                .pageSize(condition.getPageSize())
+                .pageIndex(condition.getPage())
+                .pageSize(condition.getSize())
                 .totalCount(totalProductCount)
                 .data(findDetailProductInfos)
                 .build();

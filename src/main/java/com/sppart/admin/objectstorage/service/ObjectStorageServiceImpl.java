@@ -2,10 +2,14 @@ package com.sppart.admin.objectstorage.service;
 
 import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import java.io.IOException;
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,7 +37,9 @@ public class ObjectStorageServiceImpl implements ObjectStorageService {
         metadata.setContentLength(file.getSize());
         metadata.setContentType(file.getContentType());
         try {
-            amazonS3Client.putObject(bucket, fileName, file.getInputStream(), metadata);
+            PutObjectRequest putObjectRequest = new PutObjectRequest(bucket, fileName, file.getInputStream(),
+                    metadata).withCannedAcl(CannedAccessControlList.PublicRead);
+            amazonS3Client.putObject(putObjectRequest);
         } catch (IOException e) {
             throw new IllegalArgumentException("파일 업로드 에러 : " + e.getMessage());
         }

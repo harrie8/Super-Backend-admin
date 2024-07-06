@@ -6,6 +6,7 @@ import org.springframework.core.MethodParameter;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.ModelAndViewContainer;
@@ -21,20 +22,28 @@ public class PageableVerificationArgumentResolver extends PageableHandlerMethodA
     @Override
     public Pageable resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
                                     NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
-        String pageText = webRequest.getParameter("page");
-        String sizeText = webRequest.getParameter("size");
+        String pageParameter = webRequest.getParameter("page");
+        String sizeParameter = webRequest.getParameter("size");
 
-        valid(pageText, sizeText);
+        if (StringUtils.hasText(pageParameter)) {
+            validPage(pageParameter);
+        }
+        if (StringUtils.hasText(sizeParameter)) {
+            validSize(sizeParameter);
+        }
 
         return super.resolveArgument(parameter, mavContainer, webRequest, binderFactory);
     }
 
-    private void valid(String pageText, String sizeText) {
+    private void validPage(String pageText) {
         validEmpty(pageText);
-        validEmpty(sizeText);
         validNumber(pageText);
-        validNumber(sizeText);
         validPageRange(pageText);
+    }
+
+    private void validSize(String sizeText) {
+        validEmpty(sizeText);
+        validNumber(sizeText);
         validSizeRange(sizeText);
     }
 

@@ -2,9 +2,9 @@ package com.sppart.admin.main.product.controller;
 
 import com.sppart.admin.main.exhibition.dto.ResponseGetExhibitionsByCondition;
 import com.sppart.admin.main.product.dto.DetailProductInfo;
+import com.sppart.admin.main.product.dto.ProductPageRequest;
 import com.sppart.admin.main.product.dto.ProductSearchCondition;
 import com.sppart.admin.main.product.dto.request.RequestCreateProduct;
-import com.sppart.admin.main.product.dto.request.RequestGetProducts;
 import com.sppart.admin.main.product.dto.request.RequestUpdateProduct;
 import com.sppart.admin.main.product.dto.response.ResponseBulkDeleteProductByIds;
 import com.sppart.admin.main.product.dto.response.ResponseDetailProductInfo;
@@ -18,14 +18,11 @@ import io.swagger.annotations.ApiResponses;
 import java.util.Set;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -44,20 +41,37 @@ public class ProductController {
 
     private final ProductService productService;
 
-    @ApiOperation(value = "작품 목록 - 검색 조건으로 작품 목록 조회", notes = "작품명, 작가명, 작품 코드 3가지 검색 조건으로 작품 목록을 조회하는 하는 API입니다.")
+    @ApiOperation(
+            value = "작품 목록 - 검색 조건으로 작품 목록 조회",
+            notes = "1.'작품명', '작가 이름', '작품 코드' 3가지 검색 조건으로 작품 목록을 조회하는 하는 API입니다.<br/>"
+                    + "2.'page'와 'size' 파라미터를 함께 전송하지 않을 경우 전체 작품이 조회됩니다.<br/>"
+                    + "3.'page'와 'size' 파라미터 둘 중 하나만 전송할 경우 예외가 발생합니다.<br/>"
+                    + "4.'page'는 1부터 시작합니다.<br/>"
+                    + "5.'page'와 'size' 값은 1보다 작을 경우 예외 발생합니다."
+    )
     @ApiResponses({
-            @ApiResponse(code = 200, message = "검색 조건으로 조회한 작품 목록을 반환합니다.", response = ResponseGetExhibitionsByCondition.class),
+            @ApiResponse(
+                    code = 200,
+                    message = "검색 조건으로 조회한 작품 목록을 반환합니다.",
+                    response = ResponseGetExhibitionsByCondition.class
+            ),
     })
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public PageInfo<DetailProductInfo> getExhibitionsByCondition(
-            @PageableDefault(page = 1, size = 10) Pageable pageable,
-            @ModelAttribute RequestGetProducts req) {
+    public PageInfo<DetailProductInfo> getProductsByCondition(
+            @ApiParam(value = "페이지 인덱스(1부터 시작)") @RequestParam(required = false) Integer page,
+            @ApiParam(value = "페이지 크기") @RequestParam(required = false) Integer size,
+            @ApiParam(value = "작품명") @RequestParam(required = false) String title,
+            @ApiParam(value = "작가 이름") @RequestParam(required = false) String artistName,
+            @ApiParam(value = "작가 코드") @RequestParam(required = false) Long productId) {
+
+        ProductPageRequest productPageRequest = new ProductPageRequest(page, size);
+
         ProductSearchCondition condition = ProductSearchCondition.builder()
-                .pageable(pageable)
-                .title(req.getTitle())
-                .artistName(req.getArtistName())
-                .productId(req.getProductId())
+                .productPageRequest(productPageRequest)
+                .title(title)
+                .artistName(artistName)
+                .productId(productId)
                 .build();
 
         return productService.getProductsByCondition(condition);
